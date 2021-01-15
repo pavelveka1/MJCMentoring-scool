@@ -1,0 +1,3 @@
+com\epam\esm\configuration\WebConfiguration.class
+com\epam\esm\controller\GiftCertificateController.class
+com\epam\esm\controller\TagController.class
