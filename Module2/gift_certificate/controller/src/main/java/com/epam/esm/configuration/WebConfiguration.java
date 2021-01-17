@@ -1,5 +1,6 @@
 package com.epam.esm.configuration;
 
+import com.epam.esm.service.configuration.ServiceConfiguration;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 public class WebConfiguration  extends AbstractAnnotationConfigDispatcherServletInitializer{
 
@@ -10,7 +11,7 @@ public class WebConfiguration  extends AbstractAnnotationConfigDispatcherServlet
 
         @Override
         protected Class<?>[] getServletConfigClasses() {
-            return new Class[]{DBConfig.class};
+            return new Class[]{DBConfig.class, ServiceConfiguration.class};
         }
 
         @Override

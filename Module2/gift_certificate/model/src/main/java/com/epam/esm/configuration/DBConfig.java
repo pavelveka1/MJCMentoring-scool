@@ -15,18 +15,18 @@ import java.beans.PropertyVetoException;
 @ComponentScan(basePackages = "com.epam.esm")
 @EnableWebMvc
 public class DBConfig {
-    @Value("${db.driver}")
-    private static String DRIVER_CLASS;
-    @Value("${db.url}")
-    private static String URL;
-    @Value("${db.user}")
-    private static String USER_NAME;
-    @Value("${db.password}")
-    private static String PASSWORD;
+  //  @Value("${db.driver}")
+    private static String DRIVER_CLASS="com.mysql.cj.jdbc.Driver";
+  //  @Value("${db.url}")
+    private static String URL="jdbc:mysql://localhost/gift_db?useSSl=false&serverTimezone=UTC";
+  //  @Value("${db.user}")
+    private static String USER_NAME="root_user";
+  //  @Value("${db.password}")
+    private static String PASSWORD="12345";
 
 
     @Bean
-    public DataSource dataSource() throws PropertyVetoException {
+    public DataSource dataSource() {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
         try {
             dataSource.setDriverClass(DRIVER_CLASS);

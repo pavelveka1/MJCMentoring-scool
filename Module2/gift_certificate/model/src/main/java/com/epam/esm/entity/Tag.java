@@ -17,7 +17,7 @@ public class Tag implements Serializable {
 
     private long id;
     private String name;
-    private List<GiftCertificate> sertificates = new ArrayList<GiftCertificate>();
+    private List<GiftCertificate> certificates = new ArrayList<GiftCertificate>();
 
     public Tag(long id, String name) {
         this.id = id;

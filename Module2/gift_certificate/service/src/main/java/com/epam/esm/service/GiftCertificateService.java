@@ -4,21 +4,23 @@ import java.util.List;
 
 import com.epam.esm.dao.ModeOfSort;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.service.dto.GiftCertificateDto;
+import com.epam.esm.service.exception.ServiceException;
 
 public interface GiftCertificateService {
 	
-	GiftCertificate create(GiftCertificate giftCertificate);
+	GiftCertificateDto create(GiftCertificateDto giftCertificateDto) throws ServiceException;
 
-	GiftCertificate read(long id);
+	GiftCertificateDto read(long id) throws ServiceException;
 
-	GiftCertificate update( GiftCertificate giftCertificate);
+	GiftCertificateDto update( GiftCertificateDto giftCertificateDto) throws ServiceException;
 
-	boolean delete(long id);
+	void delete(long id) throws ServiceException;
 
-	List<GiftCertificate> findByTagName(String tagName, ModeOfSort modeOfSort);
+	List<GiftCertificateDto> findByTagName(String tagName, ModeOfSort modeOfSort);
 
-	List<GiftCertificate> findByPartOfName(String name, ModeOfSort modeOfSort);
+	List<GiftCertificateDto> findByPartOfName(String name, ModeOfSort modeOfSort);
 
-	List<GiftCertificate> findAll(ModeOfSort modeOfSort);
+	List<GiftCertificateDto> findAll(ModeOfSort modeOfSort);
 
 }

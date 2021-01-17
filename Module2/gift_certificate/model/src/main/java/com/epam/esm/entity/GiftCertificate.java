@@ -19,8 +19,8 @@ public class GiftCertificate implements Serializable {
     private long id;
     private String name;
     private String description;
-    private int price;
-    private int duration;
+    private Integer price;
+    private Integer duration;
     private LocalDateTime createDate;
     private LocalDateTime lastUpdateDate;
     private List<Tag> tags = new ArrayList<Tag>();
