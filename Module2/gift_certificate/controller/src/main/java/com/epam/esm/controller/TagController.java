@@ -24,19 +24,19 @@ public class TagController {
         return service.findAll();
     }
 
-    @PostMapping("/tag")
+    @PostMapping("/tags")
     @ResponseStatus(HttpStatus.CREATED)
     public TagDto createTag(@RequestBody TagDto tagDto) throws ServiceException, DAOException {
         return service.create(tagDto);
     }
 
 
-    @GetMapping("/tag/{id}")
+    @GetMapping("/tags/{id}")
     public TagDto readTagById(@PathVariable long id) throws ServiceException {
         return service.read(id);
     }
 
-    @DeleteMapping("/tag/{id}")
+    @DeleteMapping("/tags/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTagById(@PathVariable long id) throws ServiceException {
         service.delete(id);

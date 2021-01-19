@@ -37,10 +37,10 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
 
     @Override
     @Transactional
-    public GiftCertificateDto create(GiftCertificateDto giftCertificateDto)  {
+    public GiftCertificateDto create(GiftCertificateDto giftCertificateDto) {
         GiftCertificate createdGiftCertificate;
         createAndSetTags(giftCertificateDto);
-        createdGiftCertificate =  giftCertificateJDBCTemplate.create(modelMapper.map(giftCertificateDto, GiftCertificate.class));
+        createdGiftCertificate = giftCertificateJDBCTemplate.create(modelMapper.map(giftCertificateDto, GiftCertificate.class));
         return modelMapper.map(createdGiftCertificate, GiftCertificateDto.class);
     }
 
@@ -63,7 +63,7 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
         }
         GiftCertificate readGiftCertificate = modelMapper.map(readGiftCertificateDto, GiftCertificate.class);
         updateGiftCertificateFields(readGiftCertificate, modifiedGiftCertificate);
-        GiftCertificate updateGiftCertificate =  giftCertificateJDBCTemplate.update(readGiftCertificate);
+        GiftCertificate updateGiftCertificate = giftCertificateJDBCTemplate.update(readGiftCertificate);
         return modelMapper.map(updateGiftCertificate, GiftCertificateDto.class);
     }
 
@@ -98,7 +98,7 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
                 .collect(Collectors.toList());
     }
 
-    @SneakyThrows
+
     private void createAndSetTags(GiftCertificateDto giftCertificateDto) {
         List<TagDto> tags = new ArrayList<>();
         if (giftCertificateDto.getTags() != null) {
@@ -109,7 +109,7 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
                     add = modelMapper.map(tagJDBCTemplate.create(tag), TagDto.class);
                     tags.add(add);
                 } catch (DAOException tagExist) {
-                    add = modelMapper.map(tagJDBCTemplate.readTagByName(tag.getName()), TagDto.class);
+                   add = modelMapper.map(tagJDBCTemplate.readTagByName(tag.getName()), TagDto.class);
                     tags.add(add);
                 }
             }
