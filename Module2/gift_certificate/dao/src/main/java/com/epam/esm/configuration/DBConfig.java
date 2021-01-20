@@ -12,21 +12,44 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
 
+/**
+ * DBConfig class for configure data source and jdbcTemplate as beans of Spring
+ */
 @Configuration
 @ComponentScan(basePackages = "com.epam.esm")
 @PropertySource("classpath:db.properties")
 @EnableWebMvc
 public class DBConfig {
+
+    /**
+     * String field for driver class of DB
+     */
     @Value("${db.driver}")
     private String DRIVER_CLASS;
+
+    /**
+     * String field for url DB
+     */
     @Value("${db.url}")
     private String URL;
+
+    /**
+     * String field for user name of DB
+     */
     @Value("${db.user}")
     private String USER_NAME;
+
+    /**
+     * String field for password for DB
+     */
     @Value("${db.password}")
     private String PASSWORD;
 
-
+    /**
+     * Configure DataSource bean
+     *
+     * @return DataSource
+     */
     @Bean
     private DataSource dataSource() {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
@@ -41,6 +64,11 @@ public class DBConfig {
         return dataSource;
     }
 
+    /**
+     * Configure JdbcTemplate bean
+     *
+     * @return
+     */
     @Bean
     public JdbcTemplate jdbcTemplate() {
         return new JdbcTemplate(dataSource());

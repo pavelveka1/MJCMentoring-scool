@@ -10,11 +10,14 @@ import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
 
 @Configuration
-@ComponentScan(basePackages = {"com.epam.esm"},
+@ComponentScan(basePackages = {"com.epam.esm"}
+/*,
         excludeFilters = {@ComponentScan.Filter(
                 type = FilterType.ASSIGNABLE_TYPE,
                 value = DBConfig.class
         )}
+
+ */
 )
 @Profile("test")
 public class TestConfig {

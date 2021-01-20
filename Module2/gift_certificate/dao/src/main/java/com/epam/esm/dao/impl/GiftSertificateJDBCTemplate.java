@@ -19,6 +19,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+/**
+ * GiftSertificateJDBCTemplate - class for work with GiftCertificate
+ */
 @Repository
 public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
 
@@ -35,15 +38,32 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
     private static final String DELETE_GIFT_CERTIFICATE_HAS_TAG = "DELETE FROM `gift_db`.`gift_certificates_has_tags` WHERE `gift_certificates_id` = ?";
     private static final String DELETE_GIFT_CERTIFICATE = "DELETE FROM gift_db.gift_certificates WHERE id = ?";
     private static final String DEFAULT_SORT_ORDER = "asc";
+
+    /**
+     * Instance of JdbcTemplate for work with DB
+     */
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * Instance of GiftCertificateMapper for mapping data from resultSet
+     */
     @Autowired
     private GiftCertificateMapper giftCertificateMapper;
 
+    /**
+     * Instance of TagMapper for mapping data from resultSet
+     */
     @Autowired
     private TagMapper tagMapper;
 
+    /**
+     * Create GiftCertificate in DB
+     *
+     * @param giftCertificate
+     * @return created GiftCertificate
+     * @throws DuplicateEntryDAOException if this GiftCertificate already exists in the DB
+     */
     @Override
     public GiftCertificate create(GiftCertificate giftCertificate) throws DuplicateEntryDAOException {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -70,6 +90,13 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
         return giftCertificate;
     }
 
+    /**
+     * Read GiftCertificate from DB by id
+     *
+     * @param id
+     * @return Optional<GiftCertificate></>
+     * @throws IdNotExistDAOException if records with such id not exist in DB
+     */
     @Override
     public Optional<GiftCertificate> read(long id) throws IdNotExistDAOException {
         Optional<GiftCertificate> giftCertificate = jdbcTemplate.query(SELECT_CERTIFICATE_ID, new Object[]{id}, giftCertificateMapper).stream().findFirst();
@@ -85,6 +112,12 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
         return giftCertificate;
     }
 
+    /**
+     * Update GiftCertificate
+     *
+     * @param giftCertificate
+     * @return updated GiftCertificate
+     */
     @Override
     public GiftCertificate update(GiftCertificate giftCertificate) {
         jdbcTemplate.update(UPDATE_GIFT_CERTIFICATE,
@@ -96,6 +129,12 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
         return giftCertificate;
     }
 
+    /**
+     * Delete GiftCertificate from DB by id
+     *
+     * @param id
+     * @throws IdNotExistDAOException if record with such id not exist in DB
+     */
     @Override
     public void delete(long id) throws IdNotExistDAOException {
         try {
@@ -105,6 +144,14 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
         }
     }
 
+    /**
+     * Find all giftCertificates with condition determined by parameters
+     *
+     * @param sortType  name of field of table in DB
+     * @param orderType ASC or DESC
+     * @return list og GiftCertificates
+     * @throws RequestParamDAOException if parameters don't right
+     */
     @Override
     public List<GiftCertificate> findAll(String sortType, String orderType) throws RequestParamDAOException {
         List<GiftCertificate> giftCertificateList;
@@ -132,6 +179,12 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
         return giftCertificateList;
     }
 
+    /**
+     * Delete records from link table
+     *
+     * @param id
+     * @throws IdNotExistDAOException if record with such id not exist in DB
+     */
     @Override
     public void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException {
         try {
@@ -141,6 +194,11 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
         }
     }
 
+    /**
+     * Create records in link table
+     *
+     * @param giftCertificate
+     */
     private void createGiftCertificateHasTag(GiftCertificate giftCertificate) {
         List<Tag> tags = giftCertificate.getTags();
         tags.forEach(tag -> jdbcTemplate.update(CREATE_CERTIFICATE_HAS_TAG, giftCertificate.getId(), tag.getId()));

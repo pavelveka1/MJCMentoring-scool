@@ -19,6 +19,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+/**
+ * TagJDBCTemplate - class for work with Tag
+ */
 @Repository
 public class TagJDBCTemplate implements TagDAO {
 
@@ -44,15 +47,31 @@ public class TagJDBCTemplate implements TagDAO {
     private static final Integer PARAMETER_INDEX_TAG_NAME = 1;
 
 
+    /**
+     * Instance of JdbcTemplate for work with DB
+     */
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * Instance of GiftCertificateMapper for mapping data from resultSet
+     */
     @Autowired
     private GiftCertificateMapper giftCertificateMapper;
 
+    /**
+     * Instance of TagMapper for mapping data from resultSet
+     */
     @Autowired
     private TagMapper tagMapper;
 
+    /**
+     * Create new tag in DB
+     *
+     * @param tag
+     * @return created Tag
+     * @throws DuplicateEntryDAOException if this Tag already exists in the DB
+     */
     @Override
     public Tag create(Tag tag) throws DuplicateEntryDAOException {
         if (isExist(tag.getName())) {
@@ -68,6 +87,13 @@ public class TagJDBCTemplate implements TagDAO {
         return tag;
     }
 
+    /**
+     * Read one Tag from DB by id
+     *
+     * @param id
+     * @return Optional<Tag>
+     * @throws IdNotExistDAOException if records with such id not exist in DB
+     */
     @Override
     public Optional<Tag> read(long id) throws IdNotExistDAOException {
         Optional<Tag> tag = jdbcTemplate.query(GET_TAG_BY_ID, new Object[]{id}, tagMapper).stream().findFirst();
@@ -83,7 +109,12 @@ public class TagJDBCTemplate implements TagDAO {
         return tag;
     }
 
-    //*****************************************************************
+    /**
+     * Delete Tag from DB by id
+     *
+     * @param id
+     * @throws IdNotExistDAOException if records with such id not exist in DB
+     */
     @Override
     public void delete(long id) throws IdNotExistDAOException {
         try {
@@ -94,6 +125,11 @@ public class TagJDBCTemplate implements TagDAO {
 
     }
 
+    /**
+     * Find all Tags
+     *
+     * @return list of Tags
+     */
     @Override
     public List<Tag> findAll() {
         List<Tag> tags = jdbcTemplate.query(GET_ALL_TAGS, tagMapper);
@@ -107,6 +143,13 @@ public class TagJDBCTemplate implements TagDAO {
     }
 
 
+    /**
+     * Read tag from DB by name
+     *
+     * @param tagName
+     * @return Tag
+     * @throws TagNameNotExistDAOException if Tag with such name doesn't exist in DB
+     */
     @Override
     public Tag readTagByName(String tagName) throws TagNameNotExistDAOException {
         Optional<Tag> tag = jdbcTemplate.query(GET_TAG_BY_NAME, new Object[]{tagName}, tagMapper).stream().findAny();
@@ -116,7 +159,13 @@ public class TagJDBCTemplate implements TagDAO {
         return tag.get();
     }
 
-    public void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException {
+    /**
+     * Delete records from link table
+     *
+     * @param id
+     * @throws IdNotExistDAOException if such id doesn't exist in link table of DB
+     */
+    private void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException {
         try {
             jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_HAS_TAG, id);
         } catch (Exception e) {
@@ -125,6 +174,12 @@ public class TagJDBCTemplate implements TagDAO {
 
     }
 
+    /**
+     * Check if exist Tag in DB with such name
+     *
+     * @param tagName
+     * @return true -if exist, false - not exist
+     */
     private boolean isExist(String tagName) {
         return jdbcTemplate.query(GET_TAG_BY_NAME, new Object[]{tagName}, tagMapper).stream().findAny().isPresent();
     }
