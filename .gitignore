@@ -1,4 +1,4 @@
-/.idea/
-/controller/target
-/dao/target
-/service/target
+/Module2/gift_certificate/.idea/
+/Module2/gift_certificate//controller/target
+/Module2/gift_certificate//dao/target
+/Module2/gift_certificate//service/target
