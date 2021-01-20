@@ -10,7 +10,9 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.GiftCertificateMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.TagMapper;
-import com.epam.esm.exception.DAOException;
+import com.epam.esm.exception.DuplicateEntryDAOException;
+import com.epam.esm.exception.IdNotExistDAOException;
+import com.epam.esm.exception.TagNameNotExistDAOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -21,14 +23,11 @@ import org.springframework.stereotype.Repository;
 public class TagJDBCTemplate implements TagDAO {
 
     private static final String GET_TAG_BY_NAME = "SELECT * FROM gift_db.tags where gift_db.tags.name=?";
-
-    //****************************************************************
     private static final String DELETE_GIFT_CERTIFICATE_HAS_TAG = "DELETE FROM `gift_db`.`gift_certificates_has_tags` WHERE `gift_certificates_id` = ?";
     private static final String GET_TAG_BY_ID = "SELECT * FROM gift_db.tags where gift_db.tags.id=?";
     private static final String GET_ALL_TAGS = "SELECT * FROM gift_db.tags";
     private static final String CREATE_TAG = "INSERT INTO `gift_db`.`tags` (`name`) VALUES (?);";
     private static final String DELETE_TAG = "DELETE FROM `gift_db`.`tags` WHERE (`id` = ?);";
-    private static final String TAG_DELETE_GIFT_CERTIFICATE_HAS_TAG = "DELETE FROM gift_db.gift_certificates_has_tags WHERE (tag_id=?)";
     private static final String GET_CERTIFICATES_BY_TAG_ID = "SELECT \n" +
             "gift_db.gift_certificates.id,\n" +
             "gift_db.gift_certificates.name,\n" +
@@ -43,8 +42,7 @@ public class TagJDBCTemplate implements TagDAO {
             "where gift_db.gift_certificates_has_tags.tags_id = ?;";
 
     private static final Integer PARAMETER_INDEX_TAG_NAME = 1;
-    // write sql queries
-    //******************************************************************************************************
+
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -56,9 +54,9 @@ public class TagJDBCTemplate implements TagDAO {
     private TagMapper tagMapper;
 
     @Override
-    public Tag create(Tag tag) throws DAOException {
+    public Tag create(Tag tag) throws DuplicateEntryDAOException {
         if (isExist(tag.getName())) {
-            throw new DAOException("A tag with name = " + tag.getName() + " already exists");
+            throw new DuplicateEntryDAOException("A tag with name = " + tag.getName() + " already exists");
         }
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -70,24 +68,32 @@ public class TagJDBCTemplate implements TagDAO {
         return tag;
     }
 
-    //************************************************************** зачем optional??*************
     @Override
-    public Optional<Tag> read(long id) {
+    public Optional<Tag> read(long id) throws IdNotExistDAOException {
         Optional<Tag> tag = jdbcTemplate.query(GET_TAG_BY_ID, new Object[]{id}, tagMapper).stream().findFirst();
-        List<GiftCertificate> giftCertificates = jdbcTemplate.query(GET_CERTIFICATES_BY_TAG_ID, new Object[]{id}, giftCertificateMapper);
-        for (GiftCertificate giftCertificate : giftCertificates) {
-            tag.get().getCertificates().add(giftCertificate);
+        if (tag.isPresent()) {
+            List<GiftCertificate> giftCertificates = jdbcTemplate.query(GET_CERTIFICATES_BY_TAG_ID, new Object[]{id}, giftCertificateMapper);
+            for (GiftCertificate giftCertificate : giftCertificates) {
+                tag.get().getCertificates().add(giftCertificate);
+            }
+        } else {
+            throw new IdNotExistDAOException("Tag with id = " + id + " not found");
         }
+
         return tag;
     }
 
     //*****************************************************************
     @Override
-    public void delete(long id) {
-        jdbcTemplate.update(DELETE_TAG, id);
+    public void delete(long id) throws IdNotExistDAOException {
+        try {
+            jdbcTemplate.update(DELETE_TAG, id);
+        } catch (Exception e) {
+            throw new IdNotExistDAOException("Tag with id = " + id + " is not found");
+        }
+
     }
 
-    //**************************************************************
     @Override
     public List<Tag> findAll() {
         List<Tag> tags = jdbcTemplate.query(GET_ALL_TAGS, tagMapper);
@@ -100,19 +106,26 @@ public class TagJDBCTemplate implements TagDAO {
         return tags;
     }
 
-    //*****************************************************************
+
     @Override
-    public Tag readTagByName(String tagName) {
+    public Tag readTagByName(String tagName) throws TagNameNotExistDAOException {
         Optional<Tag> tag = jdbcTemplate.query(GET_TAG_BY_NAME, new Object[]{tagName}, tagMapper).stream().findAny();
+        if (!tag.isPresent()) {
+            throw new TagNameNotExistDAOException("Tag with name = " + tagName + " is not exist");
+        }
         return tag.get();
     }
 
-    public void deleteGiftCertificateHasTag(long id) {
-        jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_HAS_TAG, id);
+    public void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException {
+        try {
+            jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_HAS_TAG, id);
+        } catch (Exception e) {
+            throw new IdNotExistDAOException("Tag with id = " + id + " is not found");
+        }
+
     }
 
     private boolean isExist(String tagName) {
         return jdbcTemplate.query(GET_TAG_BY_NAME, new Object[]{tagName}, tagMapper).stream().findAny().isPresent();
     }
 }
-//*******************************************************************

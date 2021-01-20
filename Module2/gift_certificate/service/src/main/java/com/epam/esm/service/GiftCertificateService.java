@@ -2,25 +2,22 @@ package com.epam.esm.service;
 
 import java.util.List;
 
-import com.epam.esm.dao.ModeOfSort;
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.service.dto.GiftCertificateDto;
-import com.epam.esm.service.exception.ServiceException;
+import com.epam.esm.service.exception.DuplicateEntryServiceException;
+import com.epam.esm.service.exception.IdNotExistServiceException;
+import com.epam.esm.service.exception.RequestParamServiceException;
+import com.epam.esm.service.exception.TagNameNotExistServiceException;
 
 public interface GiftCertificateService {
 	
-	GiftCertificateDto create(GiftCertificateDto giftCertificateDto) throws ServiceException;
+	GiftCertificateDto create(GiftCertificateDto giftCertificateDto) throws DuplicateEntryServiceException, TagNameNotExistServiceException;
 
-	GiftCertificateDto read(long id) throws ServiceException;
+	GiftCertificateDto read(long id) throws IdNotExistServiceException;
 
-	GiftCertificateDto update( GiftCertificateDto giftCertificateDto) throws ServiceException;
+	GiftCertificateDto update( GiftCertificateDto giftCertificateDto) throws IdNotExistServiceException;
 
-	void delete(long id) throws ServiceException;
+	void delete(long id) throws IdNotExistServiceException;
 
-	List<GiftCertificateDto> findByTagName(String tagName, ModeOfSort modeOfSort);
-
-	List<GiftCertificateDto> findByPartOfName(String name, ModeOfSort modeOfSort);
-
-	List<GiftCertificateDto> findAll(ModeOfSort modeOfSort);
+	List<GiftCertificateDto> findAll(String sortType, String orderType) throws RequestParamServiceException;
 
 }

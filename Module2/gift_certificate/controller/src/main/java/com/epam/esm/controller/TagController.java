@@ -1,11 +1,9 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.DAOException;
-import com.epam.esm.exceptionhandler.ErrorHandler;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.dto.TagDto;
-import com.epam.esm.service.exception.ServiceException;
+import com.epam.esm.service.exception.DuplicateEntryServiceException;
+import com.epam.esm.service.exception.IdNotExistServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,25 +24,20 @@ public class TagController {
 
     @PostMapping("/tags")
     @ResponseStatus(HttpStatus.CREATED)
-    public TagDto createTag(@RequestBody TagDto tagDto) throws ServiceException, DAOException {
+    public TagDto createTag(@RequestBody TagDto tagDto) throws DuplicateEntryServiceException {
         return service.create(tagDto);
     }
 
 
     @GetMapping("/tags/{id}")
-    public TagDto readTagById(@PathVariable long id) throws ServiceException {
+    public TagDto readTagById(@PathVariable long id) throws IdNotExistServiceException {
         return service.read(id);
     }
 
     @DeleteMapping("/tags/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTagById(@PathVariable long id) throws ServiceException {
+    public void deleteTagById(@PathVariable long id) throws IdNotExistServiceException {
         service.delete(id);
     }
 
-    @ExceptionHandler(value = ServiceException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorHandler handleIncorrectParameterValueException(ServiceException exception) {
-        return new ErrorHandler(exception.getMessage(), 40);
-    }
 }

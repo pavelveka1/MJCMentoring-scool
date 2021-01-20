@@ -6,13 +6,14 @@ import java.util.stream.Collectors;
 
 import com.epam.esm.dao.impl.TagJDBCTemplate;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.DAOException;
+import com.epam.esm.exception.DuplicateEntryDAOException;
+import com.epam.esm.exception.IdNotExistDAOException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.dto.TagDto;
-import com.epam.esm.service.exception.ServiceException;
+import com.epam.esm.service.exception.DuplicateEntryServiceException;
+import com.epam.esm.service.exception.IdNotExistServiceException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,37 +28,46 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @Transactional
-    public TagDto create(TagDto tagDto) throws ServiceException {
+    public TagDto create(TagDto tagDto) throws DuplicateEntryServiceException {
         {
             Tag addedTag;
             try {
-                addedTag =  tagJDBCTemplate.create(modelMapper.map(tagDto, Tag.class));
-            } catch (DAOException e) {
-                throw new ServiceException(e.getMessage(), e);
+                addedTag = tagJDBCTemplate.create(modelMapper.map(tagDto, Tag.class));
+            } catch (DuplicateEntryDAOException e) {
+                throw new DuplicateEntryServiceException(e.getMessage(), e);
             }
             return modelMapper.map(addedTag, TagDto.class);
         }
     }
 
-        @Override
-        public TagDto read ( long id) throws ServiceException {
-            Optional<Tag> readTag = tagJDBCTemplate.read(id);
-            return readTag.map(tag -> modelMapper.map(tag, TagDto.class))
-                    .orElseThrow(() -> new ServiceException("There is no tag with ID = " + id + " in Database"));
+    @Override
+    public TagDto read(long id) throws IdNotExistServiceException {
+        Optional<Tag> readTag;
+        try {
+            readTag = tagJDBCTemplate.read(id);
+        } catch (IdNotExistDAOException e) {
+            throw new IdNotExistServiceException(e.getMessage());
         }
+        return readTag.map(tag -> modelMapper.map(tag, TagDto.class))
+                .orElseThrow(() -> new IdNotExistServiceException("There is no tag with ID = " + id + " in Database"));
+    }
 
-        @Override
-        @Transactional
-        public void delete ( long id) throws ServiceException {
-            tagJDBCTemplate.read(id).orElseThrow(() -> new ServiceException("There is no tag with ID = " + id + " in Database"));
+    @Override
+    @Transactional
+    public void delete(long id) throws IdNotExistServiceException {
+        try {
+            tagJDBCTemplate.read(id).orElseThrow(() -> new IdNotExistServiceException("There is no tag with ID = " + id + " in Database"));
             tagJDBCTemplate.deleteGiftCertificateHasTag(id);
             tagJDBCTemplate.delete(id);
+        }catch (IdNotExistDAOException e){
+            throw new IdNotExistServiceException(e.getMessage());
         }
-
-        @Override
-        public List<TagDto> findAll () {
-            List<Tag> tags = tagJDBCTemplate.findAll();
-            return tags.stream().map(tag -> modelMapper.map(tag, TagDto.class)).collect(Collectors.toList());
-        }
-
     }
+
+    @Override
+    public List<TagDto> findAll() {
+        List<Tag> tags = tagJDBCTemplate.findAll();
+        return tags.stream().map(tag -> modelMapper.map(tag, TagDto.class)).collect(Collectors.toList());
+    }
+
+}

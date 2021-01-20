@@ -4,22 +4,21 @@ import java.util.List;
 import java.util.Optional;
 
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.exception.DuplicateEntryDAOException;
+import com.epam.esm.exception.IdNotExistDAOException;
+import com.epam.esm.exception.RequestParamDAOException;
 
 public interface GiftCertificateDAO {
-	GiftCertificate create(GiftCertificate giftCertificate);
+    GiftCertificate create(GiftCertificate giftCertificate) throws DuplicateEntryDAOException;
 
-	Optional<GiftCertificate> read(long id);
+    Optional<GiftCertificate> read(long id) throws IdNotExistDAOException;
 
-	GiftCertificate update( GiftCertificate giftCertificate);
+    GiftCertificate update(GiftCertificate giftCertificate);
 
-	void delete(long id);
+    void delete(long id) throws IdNotExistDAOException;
 
-	List<GiftCertificate> findByTagName(String tagName, ModeOfSort modeOfSort);
+    List<GiftCertificate> findAll(String sortType, String orderType) throws RequestParamDAOException;
 
-	List<GiftCertificate> findByPartOfName(String name, ModeOfSort modeOfSort);
-
-	List<GiftCertificate> findAll(ModeOfSort modeOfSort);
-
-	void deleteGiftCertificateHasTag(long id);
+    void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException;
 
 }

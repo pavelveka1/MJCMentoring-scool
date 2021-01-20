@@ -1,14 +1,15 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.dao.ModeOfSort;
-import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.exceptionhandler.ErrorHandler;
+import com.epam.esm.exception.TagNameNotExistDAOException;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.dto.GiftCertificateDto;
+import com.epam.esm.service.exception.DuplicateEntryServiceException;
+import com.epam.esm.service.exception.RequestParamServiceException;
+import com.epam.esm.service.exception.TagNameNotExistServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.epam.esm.service.exception.ServiceException;
+import com.epam.esm.service.exception.IdNotExistServiceException;
 
 import java.util.List;
 
@@ -20,44 +21,30 @@ public class GiftCertificateController {
     private GiftCertificateService service;
 
     @GetMapping("/gift_certificates")
-    public List<GiftCertificateDto> readAll(@RequestParam(required = false) String tagName, @RequestParam(required = false) String giftCertificateName, @RequestParam(required = false) String sort) {
-       if(tagName!=null){
-           if(giftCertificateName!=null){
-               if(sort!=null){
-
-               }
-           }
-       }
-        return service.findAll(ModeOfSort.ASC);
+    public List<GiftCertificateDto> readAll(@RequestParam(required = false) String sortType, @RequestParam(required = false) String orderType) throws RequestParamServiceException {
+        return service.findAll(sortType, orderType);
     }
 
     @GetMapping("/gift_certificates/{id}")
-    public GiftCertificateDto read(@PathVariable int id) throws ServiceException {
+    public GiftCertificateDto read(@PathVariable int id) throws IdNotExistServiceException {
         return service.read(id);
     }
 
     @PostMapping("/gift_certificates")
     @ResponseStatus(HttpStatus.CREATED)
-    public GiftCertificateDto create(@RequestBody GiftCertificateDto giftCertificateDto) throws ServiceException {
+    public GiftCertificateDto create(@RequestBody GiftCertificateDto giftCertificateDto) throws DuplicateEntryServiceException, TagNameNotExistServiceException {
         return service.create(giftCertificateDto);
     }
 
 
     @PutMapping("/gift_certificates")
-    public GiftCertificateDto update(@RequestBody GiftCertificateDto giftCertificateDto) throws ServiceException {
+    public GiftCertificateDto update(@RequestBody GiftCertificateDto giftCertificateDto) throws IdNotExistServiceException {
         return service.update(giftCertificateDto);
     }
 
     @DeleteMapping("/gift_certificates/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable int id) throws com.epam.esm.service.exception.ServiceException {
+    public void delete(@PathVariable int id) throws IdNotExistServiceException {
         service.delete(id);
-    }
-
-
-    @ExceptionHandler(value = ServiceException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorHandler handleIncorrectParameterValueException(ServiceException exception) {
-        return new ErrorHandler(exception.getMessage(), 40);
     }
 }
