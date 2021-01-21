@@ -17,15 +17,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Class TagServiceImpl.
+ * Contains methods for work with Tag class
+ */
 @Service
 public class TagServiceImpl implements TagService {
 
+    /**
+     * TagJDBCTemplate is used for operations with Tag
+     */
     @Autowired
     private TagJDBCTemplate tagJDBCTemplate;
 
+    /**
+     * ModelMapper is used for convertation TagDto to Tag
+     */
     @Autowired
     private ModelMapper modelMapper;
 
+    /**
+     * Create new tag in DB
+     * @param tagDto
+     * @return created TagDto
+     * @throws DuplicateEntryServiceException if this Tag already exists in the DB
+     */
     @Override
     @Transactional
     public TagDto create(TagDto tagDto) throws DuplicateEntryServiceException {
@@ -40,6 +56,12 @@ public class TagServiceImpl implements TagService {
         }
     }
 
+    /**
+     * Read one Tag from DB by id
+     * @param id
+     * @return Optional<Tag>
+     * @throws IdNotExistServiceException if records with such id not exist in DB
+     */
     @Override
     public TagDto read(long id) throws IdNotExistServiceException {
         Optional<Tag> readTag;
@@ -52,6 +74,11 @@ public class TagServiceImpl implements TagService {
                 .orElseThrow(() -> new IdNotExistServiceException("There is no tag with ID = " + id + " in Database"));
     }
 
+    /**
+     * Delete Tag from DB by id
+     * @param id
+     * @throws IdNotExistServiceException if records with such id not exist in DB
+     */
     @Override
     @Transactional
     public void delete(long id) throws IdNotExistServiceException {
@@ -64,6 +91,10 @@ public class TagServiceImpl implements TagService {
         }
     }
 
+    /**
+     * Find all Tags
+     * @return list of TagDto
+     */
     @Override
     public List<TagDto> findAll() {
         List<Tag> tags = tagJDBCTemplate.findAll();

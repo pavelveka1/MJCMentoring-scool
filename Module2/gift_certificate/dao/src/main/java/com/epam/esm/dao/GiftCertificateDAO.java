@@ -27,7 +27,7 @@ public interface GiftCertificateDAO {
      * Read GiftCertificate from DB by id
      *
      * @param id
-     * @return Optional<GiftCertificate></>
+     * @return Optional<GiftCertificate>
      * @throws IdNotExistDAOException if records with such id not exist in DB
      */
     Optional<GiftCertificate> read(long id) throws IdNotExistDAOException;

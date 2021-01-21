@@ -51,7 +51,7 @@ public class DBConfig {
      * @return DataSource
      */
     @Bean
-    private DataSource dataSource() {
+    public DataSource dataSource() {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
         try {
             dataSource.setDriverClass(DRIVER_CLASS);

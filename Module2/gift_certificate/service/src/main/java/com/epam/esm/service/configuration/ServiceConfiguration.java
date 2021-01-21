@@ -6,9 +6,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @Class ServiceConfiguration is used for declare bean component MjdelMapper
+ */
 @Configuration
 @ComponentScan("com.epam.esm")
 public class ServiceConfiguration {
+
+    /**
+     * Method is used for getting bean ModelMapper.
+     *
+     * @return ModelMapper what is used for convert dto class to entity class
+     */
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();

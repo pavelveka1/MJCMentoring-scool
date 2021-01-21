@@ -2,21 +2,37 @@ package com.epam.esm.configuration;
 
 import com.epam.esm.service.configuration.ServiceConfiguration;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-public class WebConfiguration  extends AbstractAnnotationConfigDispatcherServletInitializer{
 
-        @Override
-        protected Class<?>[] getRootConfigClasses() {
-            return null;
-        }
+/**
+ * @Class WebConfiguration
+ */
+public class WebConfiguration extends AbstractAnnotationConfigDispatcherServletInitializer {
 
-        @Override
-        protected Class<?>[] getServletConfigClasses() {
-            return new Class[]{DBConfig.class, ServiceConfiguration.class};
-        }
+    /**
+     * @return root config classes
+     * @method getRootConfigClasses
+     */
+    @Override
+    protected Class<?>[] getRootConfigClasses() {
+        return null;
+    }
 
-        @Override
-        protected String[] getServletMappings() {
-            return new String[]{"/"};
-        }
+    /**
+     * @return array of classes for Servlet configuration
+     * @method getServletConfigClasses
+     */
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class[]{DBConfig.class, TestConfig.class, ServiceConfiguration.class};
+    }
+
+    /**
+     * @return mapping which is set
+     * @method getServletMapping
+     */
+    @Override
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
+    }
 
 }

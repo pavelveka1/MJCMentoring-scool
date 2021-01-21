@@ -165,7 +165,7 @@ public class TagJDBCTemplate implements TagDAO {
      * @param id
      * @throws IdNotExistDAOException if such id doesn't exist in link table of DB
      */
-    private void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException {
+    public void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException {
         try {
             jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_HAS_TAG, id);
         } catch (Exception e) {
