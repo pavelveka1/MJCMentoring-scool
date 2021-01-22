@@ -2,6 +2,9 @@ package com.epam.esm.dao.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,13 +31,13 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
     private static final String SELECT_ALL_CERTIFICATES = "SELECT * FROM gift_db.gift_certificates order by id;";
     private static final String SELECT_ALL_CERTIFICATES_WITH_SORT = "SELECT * FROM gift_db.gift_certificates order by %s %s;";
     private static final String SELECT_CERTIFICATE_ID = "SELECT * FROM gift_db.gift_certificates where gift_certificates.id=?;";
-    private static final String INSERT_CERTIFICATE = "INSERT INTO `gift_db`.`gift_certificates` (`name`, `description`, `price`, `duration`) VALUES (?, ?, ?, ?);";
+    private static final String INSERT_CERTIFICATE = "INSERT INTO `gift_db`.`gift_certificates` (`name`, `description`, `price`, `duration`,`create_date`, `last_update_date`) VALUES (?, ?, ?, ?, ?, ?);";
     private static final String SELECT_TAGS_BY_CERTIFICATE_ID = "SELECT id, name FROM gift_db.gift_certificates_has_tags\n" +
             "join gift_db.tags\n" +
             "on gift_db.gift_certificates_has_tags.tags_id = gift_db.tags.id\n" +
             "where gift_db.gift_certificates_has_tags.gift_certificates_id=?;";
     private static final String CREATE_CERTIFICATE_HAS_TAG = "INSERT INTO `gift_db`.`gift_certificates_has_tags` (`gift_certificates_id`, `tags_id`) VALUES (?, ?);\n";
-    private static final String UPDATE_GIFT_CERTIFICATE = "UPDATE `gift_db`.`gift_certificates` SET `name` = ?, `description` = ?, `price` = ?, `duration` = ? WHERE (`id` = ?);\n";
+    private static final String UPDATE_GIFT_CERTIFICATE = "UPDATE `gift_db`.`gift_certificates` SET `name` = ?, `description` = ?, `price` = ?, `duration` = ?, `last_update_date` = ? WHERE (`id` = ?);\n";
     private static final String DELETE_GIFT_CERTIFICATE_HAS_TAG = "DELETE FROM `gift_db`.`gift_certificates_has_tags` WHERE `gift_certificates_id` = ?";
     private static final String DELETE_GIFT_CERTIFICATE = "DELETE FROM gift_db.gift_certificates WHERE id = ?";
     private static final String DEFAULT_SORT_ORDER = "asc";
@@ -74,6 +77,8 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
                 preparedStatement.setString(2, giftCertificate.getDescription());
                 preparedStatement.setInt(3, giftCertificate.getPrice());
                 preparedStatement.setInt(4, giftCertificate.getDuration());
+                preparedStatement.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now(ZoneId.systemDefault())));
+                preparedStatement.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now(ZoneId.systemDefault())));
                 return preparedStatement;
             }, keyHolder);
         } catch (Exception e) {
@@ -83,9 +88,6 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
         GiftCertificate createdGiftCertificate = jdbcTemplate.query(SELECT_CERTIFICATE_ID, new Object[]{keyHolder.getKey().intValue()}, giftCertificateMapper).stream().findFirst().get();
 
         giftCertificate.setId(createdGiftCertificate.getId());
-        giftCertificate.setCreateDate(createdGiftCertificate.getCreateDate());
-        giftCertificate.setLastUpdateDate(createdGiftCertificate.getLastUpdateDate());
-
         createGiftCertificateHasTag(giftCertificate);
         return giftCertificate;
     }
@@ -93,8 +95,8 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
     /**
      * Read GiftCertificate from DB by id
      *
-     * @param id
-     * @return Optional<GiftCertificate></>
+     * @param id long type parameter
+     * @return Optional<GiftCertificate>
      * @throws IdNotExistDAOException if records with such id not exist in DB
      */
     @Override
@@ -125,6 +127,7 @@ public class GiftSertificateJDBCTemplate implements GiftCertificateDAO {
                 giftCertificate.getDescription(),
                 giftCertificate.getPrice(),
                 giftCertificate.getDuration(),
+                Timestamp.valueOf(LocalDateTime.now(ZoneId.systemDefault())),
                 giftCertificate.getId());
         return giftCertificate;
     }

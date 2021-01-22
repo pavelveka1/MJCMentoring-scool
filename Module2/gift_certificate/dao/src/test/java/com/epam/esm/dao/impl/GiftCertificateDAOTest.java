@@ -24,7 +24,7 @@ import java.util.List;
 @DisplayName("Integration GiftCertificateJdbcTemplate Test")
 @ActiveProfiles("test")
  */
-@SpringJUnitConfig(classes = {TestConfig.class, DBConfig.class})
+@SpringJUnitConfig(classes = TestConfig.class)
 @Sql(value = "classpath:test-schema.sql")
 @SqlMergeMode(value = SqlMergeMode.MergeMode.MERGE)
 @WebAppConfiguration

@@ -28,8 +28,7 @@ public class TestConfig {
     }
 
     @Bean
-    public JdbcTemplate jdbcTemplate() throws PropertyVetoException {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource());
-        return jdbcTemplate;
+    public JdbcTemplate jdbcTemplate()  {
+       return new JdbcTemplate(dataSource());
     }
 }

@@ -1,10 +1,14 @@
 package com.epam.esm.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sun.istack.internal.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,42 +34,47 @@ public class GiftCertificate implements Serializable {
     /**
      * name of GiftCertificate
      */
+    @NotNull
+    @Size(min = 2, max = 45)
     private String name;
 
     /**
      * description of GiftCertificate
      */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @NotNull
+    @Size(min = 2, max = 300)
     private String description;
 
     /**
      * price of GiftCertificate
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @NotNull
+    @Min(1)
     private Integer price;
 
     /**
      * duratuin in days
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @NotNull
+    @Min(1)
     private Integer duration;
 
     /**
      * date of creation of GiftCertificate
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @NotNull
     private LocalDateTime createDate;
 
     /**
      * last date of updating of GiftCertificate
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @NotNull
     private LocalDateTime lastUpdateDate;
 
     /**
      * list of tags linked with GiftCertificate
      */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @NotEmpty
     private List<Tag> tags = new ArrayList<>();
 
 }

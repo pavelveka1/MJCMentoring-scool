@@ -1,13 +1,18 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.exceptionhandler.ValidationException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.exception.DuplicateEntryServiceException;
 import com.epam.esm.service.exception.IdNotExistServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -22,6 +27,14 @@ public class TagController {
      */
     @Autowired
     private TagService service;
+
+    @Autowired
+    private Validator tagDtoValidator;
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.setValidator(tagDtoValidator);
+    }
 
     /**
      * @return List<TagDto>
@@ -40,7 +53,10 @@ public class TagController {
      */
     @PostMapping("/tags")
     @ResponseStatus(HttpStatus.CREATED)
-    public TagDto createTag(@RequestBody TagDto tagDto) throws DuplicateEntryServiceException {
+    public TagDto createTag( @Valid @RequestBody TagDto tagDto, BindingResult bindingResult) throws DuplicateEntryServiceException, ValidationException {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException("TagDto is not valid for create operation");
+        }
         return service.create(tagDto);
     }
 

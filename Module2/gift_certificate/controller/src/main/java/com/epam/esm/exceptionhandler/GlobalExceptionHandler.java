@@ -17,21 +17,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorHandler> handleIdNotExistServiceException(IdNotExistServiceException exception) {
-        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 100), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 404), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorHandler> handleDuplicateEntryServiceException(DuplicateEntryServiceException exception) {
-        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 110), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 403), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorHandler> handleRequestParamServiceException(RequestParamServiceException exception) {
-        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 120), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 400), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorHandler> handleTagNameNotExistServiceException(TagNameNotExistServiceException exception) {
-        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 130), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 404), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorHandler> handleValidationException(ValidationException exception) {
+        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 400), HttpStatus.BAD_REQUEST);
     }
 }
