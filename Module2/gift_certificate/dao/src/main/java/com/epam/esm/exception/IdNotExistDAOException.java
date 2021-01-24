@@ -7,12 +7,6 @@ package com.epam.esm.exception;
 public class IdNotExistDAOException extends Exception {
 
     /**
-     * Constructor without parameters
-     */
-    public IdNotExistDAOException() {
-    }
-
-    /**
      * Constructor with one parameter
      *
      * @param message description of problem

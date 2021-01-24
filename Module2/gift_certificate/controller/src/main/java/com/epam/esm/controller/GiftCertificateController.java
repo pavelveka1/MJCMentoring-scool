@@ -72,7 +72,7 @@ public class GiftCertificateController {
      */
     @PostMapping("/gift_certificates")
     @ResponseStatus(HttpStatus.CREATED)
-    public GiftCertificateDto create( @Valid @RequestBody GiftCertificateDto giftCertificateDto, BindingResult bindingResult) throws DuplicateEntryServiceException, TagNameNotExistServiceException, ValidationException {
+    public GiftCertificateDto create(@Valid @RequestBody GiftCertificateDto giftCertificateDto, BindingResult bindingResult) throws DuplicateEntryServiceException, TagNameNotExistServiceException, ValidationException {
         if (bindingResult.hasErrors()) {
             throw new ValidationException("GiftCertificateDto is not valid for create operation");
         }
@@ -86,7 +86,7 @@ public class GiftCertificateController {
      * @method update - updates GiftCertificate
      */
     @PutMapping("/gift_certificates")
-    public GiftCertificateDto update( @Valid @RequestBody GiftCertificateDto giftCertificateDto, BindingResult bindingResult) throws IdNotExistServiceException, ValidationException {
+    public GiftCertificateDto update(@Valid @RequestBody GiftCertificateDto giftCertificateDto, BindingResult bindingResult) throws IdNotExistServiceException, ValidationException {
         if (bindingResult.hasErrors()) {
             throw new ValidationException("GiftCertificateDto is not valid for update operation!");
         }

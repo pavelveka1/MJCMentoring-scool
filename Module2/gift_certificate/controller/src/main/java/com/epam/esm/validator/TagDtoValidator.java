@@ -1,6 +1,5 @@
 package com.epam.esm.validator;
 
-import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.TagDto;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;

@@ -3,8 +3,6 @@ package com.epam.esm.entity;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -23,8 +21,6 @@ public class TagMapper implements RowMapper<Tag> {
     /**
      * name field is mapping with name field Tag class
      */
-    @NotNull
-    @Size(min = 2, max = 45)
     private static final String NAME = "name";
 
     /**

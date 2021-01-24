@@ -17,7 +17,7 @@ public interface GiftCertificateService {
     /**
      * Create GiftCertificate in DB
      *
-     * @param giftCertificateDto
+     * @param giftCertificateDto it contains data for creation giftCertificate
      * @return created GiftCertificate as GiftCertificateDto
      * @throws DuplicateEntryServiceException if this GiftCertificate already exists in the DB
      */
@@ -26,16 +26,17 @@ public interface GiftCertificateService {
     /**
      * Read GiftCertificateDto from DB by id
      *
-     * @param id
+     * @param id id of GiftCertificate
      * @return GiftCertificateDto
      * @throws IdNotExistServiceException if records with such id not exist in DB
      */
     GiftCertificateDto read(long id) throws IdNotExistServiceException;
 
+
     /**
      * Update GiftCertificate as GiftCertificateDto
      *
-     * @param giftCertificateDto
+     * @param giftCertificateDto modified GiftCertificate
      * @return updated GiftCertificateDto
      */
     GiftCertificateDto update(GiftCertificateDto giftCertificateDto) throws IdNotExistServiceException;
@@ -43,7 +44,7 @@ public interface GiftCertificateService {
     /**
      * Delete GiftCertificate from DB by id
      *
-     * @param id
+     * @param id id of GiftCertificate
      * @throws IdNotExistServiceException if record with such id not exist in DB
      */
     void delete(long id) throws IdNotExistServiceException;

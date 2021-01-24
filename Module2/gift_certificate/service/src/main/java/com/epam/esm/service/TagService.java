@@ -14,7 +14,8 @@ public interface TagService {
 
 	/**
 	 * Create new tag in DB
-	 * @param tagDto
+	 *
+	 * @param tagDto it contains data of Tag will be created
 	 * @return created TagDto
 	 * @throws DuplicateEntryServiceException if this Tag already exists in the DB
 	 */
@@ -22,7 +23,8 @@ public interface TagService {
 
 	/**
 	 * Read one Tag from DB by id
-	 * @param id
+	 *
+	 * @param id id of Tag
 	 * @return Optional<Tag>
 	 * @throws IdNotExistServiceException if records with such id not exist in DB
 	 */
@@ -30,13 +32,15 @@ public interface TagService {
 
 	/**
 	 * Delete Tag from DB by id
-	 * @param id
+	 *
+	 * @param id id of Tag
 	 * @throws IdNotExistServiceException if records with such id not exist in DB
 	 */
 	void delete(long id) throws IdNotExistServiceException;
 
 	/**
 	 * Find all Tags
+	 *
 	 * @return list of TagDto
 	 */
 	List<TagDto> findAll();

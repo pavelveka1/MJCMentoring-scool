@@ -16,7 +16,8 @@ public interface TagDAO {
 
     /**
      * Create new tag in DB
-     * @param tag
+     *
+     * @param tag will be created in DB
      * @return created Tag
      * @throws DuplicateEntryDAOException if this Tag already exists in the DB
      */
@@ -24,7 +25,8 @@ public interface TagDAO {
 
     /**
      * Read one Tag from DB by id
-     * @param id
+     *
+     * @param id Tag with this id will be read from DB
      * @return Optional<Tag>
      * @throws IdNotExistDAOException if records with such id not exist in DB
      */
@@ -32,7 +34,8 @@ public interface TagDAO {
 
     /**
      * Delete Tag from DB by id
-     * @param id
+     *
+     * @param id Tag with this id will be deleted from DB
      * @throws IdNotExistDAOException if records with such id not exist in DB
      */
 	void delete(long id) throws IdNotExistDAOException;
@@ -45,7 +48,8 @@ public interface TagDAO {
 
     /**
      * Read tag from DB by name
-     * @param tagName
+     *
+     * @param tagName name of tag
      * @return Tag
      * @throws TagNameNotExistDAOException if Tag with such name doesn't exist in DB
      */

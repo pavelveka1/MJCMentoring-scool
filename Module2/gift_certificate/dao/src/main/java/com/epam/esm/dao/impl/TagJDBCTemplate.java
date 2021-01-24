@@ -68,7 +68,7 @@ public class TagJDBCTemplate implements TagDAO {
     /**
      * Create new tag in DB
      *
-     * @param tag
+     * @param tag will be created in DB
      * @return created Tag
      * @throws DuplicateEntryDAOException if this Tag already exists in the DB
      */
@@ -90,7 +90,7 @@ public class TagJDBCTemplate implements TagDAO {
     /**
      * Read one Tag from DB by id
      *
-     * @param id
+     * @param id Tag with this id will be read from DB
      * @return Optional<Tag>
      * @throws IdNotExistDAOException if records with such id not exist in DB
      */
@@ -112,17 +112,12 @@ public class TagJDBCTemplate implements TagDAO {
     /**
      * Delete Tag from DB by id
      *
-     * @param id
+     * @param id Tag with this id will be deleted from DB
      * @throws IdNotExistDAOException if records with such id not exist in DB
      */
     @Override
-    public void delete(long id) throws IdNotExistDAOException {
-        try {
-            jdbcTemplate.update(DELETE_TAG, id);
-        } catch (Exception e) {
-            throw new IdNotExistDAOException("Tag with id = " + id + " is not found");
-        }
-
+    public void delete(long id) {
+        jdbcTemplate.update(DELETE_TAG, id);
     }
 
     /**
@@ -146,7 +141,7 @@ public class TagJDBCTemplate implements TagDAO {
     /**
      * Read tag from DB by name
      *
-     * @param tagName
+     * @param tagName name of tag
      * @return Tag
      * @throws TagNameNotExistDAOException if Tag with such name doesn't exist in DB
      */
@@ -162,7 +157,7 @@ public class TagJDBCTemplate implements TagDAO {
     /**
      * Delete records from link table
      *
-     * @param id
+     * @param id it is id of tag whose link with GiftCertificates will be deleted
      * @throws IdNotExistDAOException if such id doesn't exist in link table of DB
      */
     public void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException {
@@ -177,7 +172,7 @@ public class TagJDBCTemplate implements TagDAO {
     /**
      * Check if exist Tag in DB with such name
      *
-     * @param tagName
+     * @param tagName name of tag
      * @return true -if exist, false - not exist
      */
     private boolean isExist(String tagName) {

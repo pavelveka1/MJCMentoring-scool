@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorHandler> handleDuplicateEntryServiceException(DuplicateEntryServiceException exception) {
-        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 403), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 400), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler

@@ -17,7 +17,7 @@ public interface GiftCertificateDAO {
     /**
      * Create GiftCertificate in DB
      *
-     * @param giftCertificate
+     * @param giftCertificate we wont create in DB
      * @return created GiftCertificate
      * @throws DuplicateEntryDAOException if this GiftCertificate already exists in the DB
      */
@@ -26,7 +26,7 @@ public interface GiftCertificateDAO {
     /**
      * Read GiftCertificate from DB by id
      *
-     * @param id
+     * @param id long type parameter
      * @return Optional<GiftCertificate>
      * @throws IdNotExistDAOException if records with such id not exist in DB
      */
@@ -35,16 +35,16 @@ public interface GiftCertificateDAO {
     /**
      * Update GiftCertificate
      *
-     * @param giftCertificate
+     * @param giftCertificate we wont update
      * @return updated GiftCertificate
      */
     GiftCertificate update(GiftCertificate giftCertificate);
 
     /**
-     * Delete GiftCertificate from DB by id
+     * Delete Tag from DB by id
      *
-     * @param id
-     * @throws IdNotExistDAOException if record with such id not exist in DB
+     * @param id Tag with this id will be deleted from DB
+     * @throws IdNotExistDAOException if records with such id not exist in DB
      */
     void delete(long id) throws IdNotExistDAOException;
 
@@ -61,8 +61,8 @@ public interface GiftCertificateDAO {
     /**
      * Delete records from link table
      *
-     * @param id
-     * @throws IdNotExistDAOException if record with such id not exist in DB
+     * @param id it is id of tag whose link with GiftCertificates will be deleted
+     * @throws IdNotExistDAOException if such id doesn't exist in link table of DB
      */
     void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException;
 

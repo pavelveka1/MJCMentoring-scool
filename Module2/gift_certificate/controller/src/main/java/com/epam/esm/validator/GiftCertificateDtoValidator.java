@@ -17,11 +17,11 @@ public class GiftCertificateDtoValidator implements Validator {
         GiftCertificateDto giftCertificateDto = (GiftCertificateDto) target;
         if (!giftCertificateDto.getName().matches(".{2,45}")) {
             errors.rejectValue("name", "certificate.name.incorrect");
-        }else if(!giftCertificateDto.getDescription().matches(".{2,300}")){
+        } else if (!giftCertificateDto.getDescription().matches(".{2,300}")) {
             errors.rejectValue("description", "certificate.description.incorrect");
-        }else if(giftCertificateDto.getPrice()<=0){
+        } else if (giftCertificateDto.getPrice() <= 0) {
             errors.rejectValue("price", "certificate.price.incorrect");
-        }else if(giftCertificateDto.getDuration()<=0){
+        } else if (giftCertificateDto.getDuration() <= 0) {
             errors.rejectValue("duration", "certificate.duration.incorrect");
         }
     }

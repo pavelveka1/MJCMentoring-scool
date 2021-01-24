@@ -33,6 +33,7 @@ public class IdNotExistServiceException extends Exception {
 
     /**
      * Constructor with one parameter
+     *
      * @param cause
      */
     public IdNotExistServiceException(Throwable cause) {

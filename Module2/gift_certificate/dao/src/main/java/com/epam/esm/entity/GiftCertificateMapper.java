@@ -1,13 +1,12 @@
 package com.epam.esm.entity;
 
-import com.sun.istack.internal.NotNull;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
@@ -25,41 +24,31 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
     /**
      * name field is mapping with name field GiftCertificate class
      */
-    @NotNull
-    @Size(min=2, max=45)
     private static final String NAME = "name";
 
     /**
      * description field is mapping with description field GiftCertificate class
      */
-    @NotNull
-    @Size(min = 2, max = 300)
     private static final String DESCRIPTION = "description";
 
     /**
      * price field is mapping with price field GiftCertificate class
      */
-    @NotNull
-    @Min(1)
     private static final String PRICE = "price";
 
     /**
      * duration field is mapping with duration field GiftCertificate class
      */
-    @NotNull
-    @Min(1)
     private static final String DURATION = "duration";
 
     /**
      * create_date field is mapping with createDate field GiftCertificate class
      */
-    @NotNull
     private static final String CREATE_DATE = "create_date";
 
     /**
      * last_update_date field is mapping with lastUpdateDate field GiftCertificate class
      */
-    @NotNull
     private static final String LAST_UPDATE_DATE = "last_update_date";
 
     /**
@@ -78,8 +67,8 @@ public class GiftCertificateMapper implements RowMapper<GiftCertificate> {
         giftCertificate.setDescription(rs.getString(DESCRIPTION));
         giftCertificate.setPrice(rs.getInt(PRICE));
         giftCertificate.setDuration(rs.getInt(DURATION));
-        giftCertificate.setCreateDate(rs.getTimestamp(CREATE_DATE).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        giftCertificate.setLastUpdateDate(rs.getTimestamp(LAST_UPDATE_DATE).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        giftCertificate.setCreateDate(rs.getTimestamp(CREATE_DATE).toLocalDateTime());
+        giftCertificate.setLastUpdateDate(rs.getTimestamp(LAST_UPDATE_DATE).toLocalDateTime());
         return giftCertificate;
     }
 

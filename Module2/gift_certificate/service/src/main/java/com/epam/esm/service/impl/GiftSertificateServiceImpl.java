@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.epam.esm.dao.impl.GiftSertificateJDBCTemplate;
+import com.epam.esm.dao.impl.GiftCertificateJDBCTemplate;
 import com.epam.esm.dao.impl.TagJDBCTemplate;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
@@ -35,7 +35,7 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
      * GiftSertificateJDBCTemplate is used for operations with GiftCertificate
      */
     @Autowired
-    private GiftSertificateJDBCTemplate giftCertificateJDBCTemplate;
+    private GiftCertificateJDBCTemplate giftCertificateJDBCTemplate;
 
     /**
      * TagJDBCTemplate is used for operations with Tag
@@ -50,9 +50,28 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
     private ModelMapper modelMapper;
 
     /**
+     * Empty constructor
+     */
+    public GiftSertificateServiceImpl() {
+
+    }
+
+    /**
+     * Constcuctor with all parameters
+     * @param giftSertificateJDBCTemplate for operations with GiftCertivicate
+     * @param tagJDBCTemplate for operations with Tag
+     * @param modelMapper for convertion object
+     */
+    public GiftSertificateServiceImpl(GiftCertificateJDBCTemplate giftSertificateJDBCTemplate, TagJDBCTemplate tagJDBCTemplate, ModelMapper modelMapper) {
+        this.giftCertificateJDBCTemplate = giftSertificateJDBCTemplate;
+        this.tagJDBCTemplate = tagJDBCTemplate;
+        this.modelMapper = modelMapper;
+    }
+
+    /**
      * Create GiftCertificate in DB
      *
-     * @param giftCertificateDto
+     * @param giftCertificateDto it contains data for creation giftCertificate
      * @return created GiftCertificate as GiftCertificateDto
      * @throws DuplicateEntryServiceException if this GiftCertificate already exists in the DB
      */
@@ -76,7 +95,7 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
     /**
      * Read GiftCertificateDto from DB by id
      *
-     * @param id
+     * @param id id of GiftCertificate
      * @return GiftCertificateDto
      * @throws IdNotExistServiceException if records with such id not exist in DB
      */
@@ -97,7 +116,7 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
     /**
      * Update GiftCertificate as GiftCertificateDto
      *
-     * @param modifiedGiftCertificateDto
+     * @param modifiedGiftCertificateDto modified GiftCertificate
      * @return updated GiftCertificateDto
      */
     @Override
@@ -105,9 +124,6 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
     public GiftCertificateDto update(GiftCertificateDto modifiedGiftCertificateDto) throws IdNotExistServiceException {
         GiftCertificate modifiedGiftCertificate = modelMapper.map(modifiedGiftCertificateDto, GiftCertificate.class);
         GiftCertificateDto readGiftCertificateDto = read(modifiedGiftCertificateDto.getId());
-        if (readGiftCertificateDto == null) {
-            throw new IdNotExistServiceException("There is no gift certificate with ID = " + modifiedGiftCertificateDto.getId() + " in Database");
-        }
         GiftCertificate readGiftCertificate = modelMapper.map(readGiftCertificateDto, GiftCertificate.class);
         updateGiftCertificateFields(readGiftCertificate, modifiedGiftCertificate);
         GiftCertificate updateGiftCertificate = giftCertificateJDBCTemplate.update(readGiftCertificate);
@@ -117,7 +133,7 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
     /**
      * Delete GiftCertificate from DB by id
      *
-     * @param id
+     * @param id id of GiftCertificate
      * @throws IdNotExistServiceException if record with such id not exist in DB
      */
     @Override
@@ -158,7 +174,7 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
     /**
      * Method creates tags in DB if such tags aren't exist yet
      *
-     * @param giftCertificateDto
+     * @param giftCertificateDto it contains data of GiftCertificate
      * @throws TagNameNotExistDAOException
      */
     private void createAndSetTags(GiftCertificateDto giftCertificateDto) throws TagNameNotExistDAOException {
@@ -168,7 +184,8 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
             for (TagDto tagDto : giftCertificateDto.getTags()) {
                 Tag tag = modelMapper.map(tagDto, Tag.class);
                 try {
-                    add = modelMapper.map(tagJDBCTemplate.create(tag), TagDto.class);
+                    tag = tagJDBCTemplate.create(tag);
+                    add = modelMapper.map(tag, TagDto.class);
                     tags.add(add);
                 } catch (DuplicateEntryDAOException tagExist) {
                     add = modelMapper.map(tagJDBCTemplate.readTagByName(tag.getName()), TagDto.class);
@@ -183,8 +200,8 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
     /**
      * Method updates fieflds GiftCertificate
      *
-     * @param readGiftCertificateDto
-     * @param modifiedGiftCertificate
+     * @param readGiftCertificateDto original GiftCertificate
+     * @param modifiedGiftCertificate updated GiftCertificate
      */
     private void updateGiftCertificateFields(GiftCertificate readGiftCertificateDto, GiftCertificate
             modifiedGiftCertificate) {

@@ -37,8 +37,27 @@ public class TagServiceImpl implements TagService {
     private ModelMapper modelMapper;
 
     /**
+     * Empty constructor
+     */
+    public TagServiceImpl() {
+
+    }
+
+    /**
+     * Constcuctor with all parameters
+     *
+     * @param tagJDBCTemplate for operations with Tag
+     * @param modelMapper     for convertion object
+     */
+    public TagServiceImpl(TagJDBCTemplate tagJDBCTemplate, ModelMapper modelMapper) {
+        this.tagJDBCTemplate = tagJDBCTemplate;
+        this.modelMapper = modelMapper;
+    }
+
+    /**
      * Create new tag in DB
-     * @param tagDto
+     *
+     * @param tagDto it contains data of Tag will be created
      * @return created TagDto
      * @throws DuplicateEntryServiceException if this Tag already exists in the DB
      */
@@ -58,7 +77,8 @@ public class TagServiceImpl implements TagService {
 
     /**
      * Read one Tag from DB by id
-     * @param id
+     *
+     * @param id id of Tag
      * @return Optional<Tag>
      * @throws IdNotExistServiceException if records with such id not exist in DB
      */
@@ -76,23 +96,24 @@ public class TagServiceImpl implements TagService {
 
     /**
      * Delete Tag from DB by id
-     * @param id
+     *
+     * @param id id of Tag
      * @throws IdNotExistServiceException if records with such id not exist in DB
      */
     @Override
     @Transactional
     public void delete(long id) throws IdNotExistServiceException {
         try {
-            tagJDBCTemplate.read(id).orElseThrow(() -> new IdNotExistServiceException("There is no tag with ID = " + id + " in Database"));
             tagJDBCTemplate.deleteGiftCertificateHasTag(id);
             tagJDBCTemplate.delete(id);
-        }catch (IdNotExistDAOException e){
+        } catch (IdNotExistDAOException e) {
             throw new IdNotExistServiceException(e.getMessage());
         }
     }
 
     /**
      * Find all Tags
+     *
      * @return list of TagDto
      */
     @Override
