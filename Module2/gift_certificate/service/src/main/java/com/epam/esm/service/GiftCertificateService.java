@@ -2,11 +2,9 @@ package com.epam.esm.service;
 
 import java.util.List;
 
+import com.epam.esm.exception.UpdateDAOException;
 import com.epam.esm.service.dto.GiftCertificateDto;
-import com.epam.esm.service.exception.DuplicateEntryServiceException;
-import com.epam.esm.service.exception.IdNotExistServiceException;
-import com.epam.esm.service.exception.RequestParamServiceException;
-import com.epam.esm.service.exception.TagNameNotExistServiceException;
+import com.epam.esm.service.exception.*;
 
 /**
  * Interface GiftCertificateService.
@@ -39,7 +37,7 @@ public interface GiftCertificateService {
      * @param giftCertificateDto modified GiftCertificate
      * @return updated GiftCertificateDto
      */
-    GiftCertificateDto update(GiftCertificateDto giftCertificateDto) throws IdNotExistServiceException;
+    GiftCertificateDto update(GiftCertificateDto giftCertificateDto) throws UpdateServiceException, IdNotExistServiceException;
 
     /**
      * Delete GiftCertificate from DB by id

@@ -64,15 +64,13 @@ public class TagServiceImpl implements TagService {
     @Override
     @Transactional
     public TagDto create(TagDto tagDto) throws DuplicateEntryServiceException {
-        {
-            Tag addedTag;
-            try {
-                addedTag = tagJDBCTemplate.create(modelMapper.map(tagDto, Tag.class));
-            } catch (DuplicateEntryDAOException e) {
-                throw new DuplicateEntryServiceException(e.getMessage(), e);
-            }
-            return modelMapper.map(addedTag, TagDto.class);
+        Tag addedTag;
+        try {
+            addedTag = tagJDBCTemplate.create(modelMapper.map(tagDto, Tag.class));
+        } catch (DuplicateEntryDAOException e) {
+            throw new DuplicateEntryServiceException(e.getMessage(), e);
         }
+        return modelMapper.map(addedTag, TagDto.class);
     }
 
     /**
@@ -84,14 +82,13 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     public TagDto read(long id) throws IdNotExistServiceException {
-        Optional<Tag> readTag;
+        Tag readTag;
         try {
             readTag = tagJDBCTemplate.read(id);
         } catch (IdNotExistDAOException e) {
             throw new IdNotExistServiceException(e.getMessage());
         }
-        return readTag.map(tag -> modelMapper.map(tag, TagDto.class))
-                .orElseThrow(() -> new IdNotExistServiceException("There is no tag with ID = " + id + " in Database"));
+        return modelMapper.map(readTag, TagDto.class);
     }
 
     /**
@@ -104,12 +101,12 @@ public class TagServiceImpl implements TagService {
     @Transactional
     public void delete(long id) throws IdNotExistServiceException {
         try {
-            tagJDBCTemplate.deleteGiftCertificateHasTag(id);
             tagJDBCTemplate.delete(id);
         } catch (IdNotExistDAOException e) {
             throw new IdNotExistServiceException(e.getMessage());
         }
     }
+
 
     /**
      * Find all Tags

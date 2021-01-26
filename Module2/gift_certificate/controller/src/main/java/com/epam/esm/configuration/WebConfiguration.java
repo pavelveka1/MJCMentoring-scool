@@ -23,7 +23,7 @@ public class WebConfiguration extends AbstractAnnotationConfigDispatcherServletI
      */
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{DBConfig.class, TestConfig.class, ServiceConfiguration.class};
+        return new Class[]{DBConfig.class, ServiceConfiguration.class};
     }
 
     /**

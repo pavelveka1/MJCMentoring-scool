@@ -1,9 +1,6 @@
 package com.epam.esm.exceptionhandler;
 
-import com.epam.esm.service.exception.DuplicateEntryServiceException;
-import com.epam.esm.service.exception.IdNotExistServiceException;
-import com.epam.esm.service.exception.RequestParamServiceException;
-import com.epam.esm.service.exception.TagNameNotExistServiceException;
+import com.epam.esm.service.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -39,4 +36,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorHandler> handleValidationException(ValidationException exception) {
         return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 400), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorHandler> handleUpdateException(UpdateServiceException exception) {
+        return new ResponseEntity<ErrorHandler>(new ErrorHandler(exception.getMessage(), 400), HttpStatus.BAD_REQUEST);
+    }
+
 }

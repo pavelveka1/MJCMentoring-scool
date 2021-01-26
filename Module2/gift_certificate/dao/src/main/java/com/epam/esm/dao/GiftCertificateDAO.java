@@ -7,6 +7,7 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.DuplicateEntryDAOException;
 import com.epam.esm.exception.IdNotExistDAOException;
 import com.epam.esm.exception.RequestParamDAOException;
+import com.epam.esm.exception.UpdateDAOException;
 
 /**
  * Interface GiftCertificateDAO.
@@ -30,15 +31,16 @@ public interface GiftCertificateDAO {
      * @return Optional<GiftCertificate>
      * @throws IdNotExistDAOException if records with such id not exist in DB
      */
-    Optional<GiftCertificate> read(long id) throws IdNotExistDAOException;
+    GiftCertificate read(long id) throws IdNotExistDAOException;
 
     /**
      * Update GiftCertificate
      *
      * @param giftCertificate we wont update
      * @return updated GiftCertificate
+     * @throws UpdateDAOException will be thrown when giftCertificate has not been updated
      */
-    GiftCertificate update(GiftCertificate giftCertificate);
+    GiftCertificate update(GiftCertificate giftCertificate) throws UpdateDAOException;
 
     /**
      * Delete Tag from DB by id

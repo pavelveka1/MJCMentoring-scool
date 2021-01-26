@@ -2,6 +2,7 @@ package com.epam.esm.service;
 
 import java.util.List;
 
+import com.epam.esm.exception.IdNotExistDAOException;
 import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.exception.DuplicateEntryServiceException;
 import com.epam.esm.service.exception.IdNotExistServiceException;

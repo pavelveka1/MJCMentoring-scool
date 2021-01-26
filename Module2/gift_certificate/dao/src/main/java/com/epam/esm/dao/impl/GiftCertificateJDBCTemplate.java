@@ -1,11 +1,13 @@
 package com.epam.esm.dao.impl;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.epam.esm.dao.GiftCertificateDAO;
@@ -16,7 +18,10 @@ import com.epam.esm.entity.TagMapper;
 import com.epam.esm.exception.DuplicateEntryDAOException;
 import com.epam.esm.exception.IdNotExistDAOException;
 import com.epam.esm.exception.RequestParamDAOException;
+import com.epam.esm.exception.UpdateDAOException;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -28,10 +33,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class GiftCertificateJDBCTemplate implements GiftCertificateDAO {
 
+    private static final Logger logger = Logger.getLogger(GiftCertificateJDBCTemplate.class);
     private static final String SELECT_ALL_CERTIFICATES = "SELECT * FROM gift_db.gift_certificates order by id;";
     private static final String SELECT_ALL_CERTIFICATES_WITH_SORT = "SELECT * FROM gift_db.gift_certificates order by %s %s;";
     private static final String SELECT_CERTIFICATE_ID = "SELECT * FROM gift_db.gift_certificates where gift_certificates.id=?;";
-    private static final String INSERT_CERTIFICATE = "INSERT INTO `gift_db`.`gift_certificates` (`name`, `description`, `price`, `duration`,`create_date`, `last_update_date`) VALUES (?, ?, ?, ?, ?, ?);";
+    private static final String INSERT_CERTIFICATE = "INSERT INTO gift_db.gift_certificates (name, description, price, duration, create_date, last_update_date) VALUES (?, ?, ?, ?, ?, ?);";
     private static final String SELECT_TAGS_BY_CERTIFICATE_ID = "SELECT id, name FROM gift_db.gift_certificates_has_tags\n" +
             "join gift_db.tags\n" +
             "on gift_db.gift_certificates_has_tags.tags_id = gift_db.tags.id\n" +
@@ -70,6 +76,8 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateDAO {
     @Override
     public GiftCertificate create(GiftCertificate giftCertificate) throws DuplicateEntryDAOException {
         KeyHolder keyHolder = new GeneratedKeyHolder();
+        giftCertificate.setCreateDate(LocalDateTime.now(ZoneId.systemDefault()));
+        giftCertificate.setLastUpdateDate(giftCertificate.getCreateDate());
         try {
             jdbcTemplate.update(connection -> {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CERTIFICATE, Statement.RETURN_GENERATED_KEYS);
@@ -77,19 +85,20 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateDAO {
                 preparedStatement.setString(2, giftCertificate.getDescription());
                 preparedStatement.setInt(3, giftCertificate.getPrice());
                 preparedStatement.setInt(4, giftCertificate.getDuration());
-                preparedStatement.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now(ZoneId.systemDefault())));
-                preparedStatement.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now(ZoneId.systemDefault())));
+                preparedStatement.setTimestamp(5, Timestamp.valueOf(giftCertificate.getCreateDate()));
+                preparedStatement.setTimestamp(6, Timestamp.valueOf(giftCertificate.getLastUpdateDate()));
                 return preparedStatement;
             }, keyHolder);
         } catch (Exception e) {
+            logger.error("Trying to create duplicate entry of GiftCertificate");
             throw new DuplicateEntryDAOException(e.getMessage());
+
         }
+        logger.info("GiftCertificate is created in DB");
+        giftCertificate.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
-        GiftCertificate createdGiftCertificate = jdbcTemplate.query(SELECT_CERTIFICATE_ID, new Object[]{keyHolder.getKey().intValue()}, giftCertificateMapper).stream().findFirst().get();
-
-        giftCertificate.setId(createdGiftCertificate.getId());
         createGiftCertificateHasTag(giftCertificate);
-        return createdGiftCertificate;
+        return giftCertificate;
     }
 
     /**
@@ -100,17 +109,18 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateDAO {
      * @throws IdNotExistDAOException if records with such id not exist in DB
      */
     @Override
-    public Optional<GiftCertificate> read(long id) throws IdNotExistDAOException {
+    public GiftCertificate read(long id) throws IdNotExistDAOException {
         Optional<GiftCertificate> giftCertificate = jdbcTemplate.query(SELECT_CERTIFICATE_ID, new Object[]{id}, giftCertificateMapper).stream().findFirst();
-        if (giftCertificate.isPresent()) {
-            List<Tag> tags = jdbcTemplate.query(SELECT_TAGS_BY_CERTIFICATE_ID, new Object[]{id}, tagMapper);
-            for (Tag tag : tags) {
-                giftCertificate.get().getTags().add(tag);
-            }
-        } else {
+        if (!giftCertificate.isPresent()) {
+            logger.error("GiftCertificate with id=" + id + " is not exist in DB");
             throw new IdNotExistDAOException("There is no gift certificate with ID = " + id + " in Database");
         }
-        return giftCertificate;
+        List<Tag> tags = jdbcTemplate.query(SELECT_TAGS_BY_CERTIFICATE_ID, new Object[]{id}, tagMapper);
+        logger.info("GiftCertificate is read from DB");
+        for (Tag tag : tags) {
+            giftCertificate.get().getTags().add(tag);
+        }
+        return giftCertificate.get();
     }
 
     /**
@@ -120,14 +130,19 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateDAO {
      * @return updated GiftCertificate
      */
     @Override
-    public GiftCertificate update(GiftCertificate giftCertificate) {
-        jdbcTemplate.update(UPDATE_GIFT_CERTIFICATE,
+    public GiftCertificate update(GiftCertificate giftCertificate) throws UpdateDAOException {
+        int i = jdbcTemplate.update(UPDATE_GIFT_CERTIFICATE,
                 giftCertificate.getName(),
                 giftCertificate.getDescription(),
                 giftCertificate.getPrice(),
                 giftCertificate.getDuration(),
                 LocalDateTime.now(ZoneId.systemDefault()),
                 giftCertificate.getId());
+        if (i == 0) {
+            logger.info("GiftCertificate is not updated in DB");
+            throw new UpdateDAOException("giftCertificate has not been updated");
+        }
+        logger.info("GiftCertificate has been updated in DB");
         return giftCertificate;
     }
 
@@ -135,11 +150,16 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateDAO {
      * Delete GiftCertificate from DB by id
      *
      * @param id GiftCertificate with this id will be deleted from DB
-     * @throws IdNotExistDAOException if record with such id not exist in DB
      */
     @Override
-    public void delete(long id) {
-        jdbcTemplate.update(DELETE_GIFT_CERTIFICATE, id);
+    public void delete(long id) throws IdNotExistDAOException {
+        int i = jdbcTemplate.update(DELETE_GIFT_CERTIFICATE, id);
+        if (i == 0) {
+            logger.info("GiftCertificate isn't deleted from DB");
+            throw new IdNotExistDAOException("GiftCertificate with id = " + id + "is not exist in DB");
+        } else {
+            logger.info("GiftCertificate is deleted from DB");
+        }
     }
 
     /**
@@ -174,6 +194,7 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateDAO {
                 giftCertificate.getTags().add(tag);
             }
         }
+        logger.info(" list of GiftCertificates is found");
         return giftCertificateList;
     }
 
@@ -185,11 +206,13 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateDAO {
      */
     @Override
     public void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException {
-        try {
-            jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_HAS_TAG, id);
-        } catch (Exception e) {
+
+        int i = jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_HAS_TAG, id);
+        if (i == 0) {
+            logger.info("id = " + id + " of GiftCertificate is not found in gift_certificates_has_tags table of DB");
             throw new IdNotExistDAOException("There is no entry with ID = " + id + " in table gift_certificates_has_tags Database");
         }
+        logger.info(" Entries with id = " + id + " of GiftCertificate have been deleted in gift_certificates_has_tags table of DB");
     }
 
     /**
@@ -198,8 +221,24 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateDAO {
      * @param giftCertificate create Entries in link table for this GiftCertificate
      */
     private void createGiftCertificateHasTag(GiftCertificate giftCertificate) {
+        batchUpdateGiftCertificateHasTg(giftCertificate);
+    }
+
+    private void batchUpdateGiftCertificateHasTg(GiftCertificate giftCertificate) {
         List<Tag> tags = giftCertificate.getTags();
-        tags.forEach(tag -> jdbcTemplate.update(CREATE_CERTIFICATE_HAS_TAG, giftCertificate.getId(), tag.getId()));
+        jdbcTemplate.batchUpdate(
+                CREATE_CERTIFICATE_HAS_TAG,
+                new BatchPreparedStatementSetter() {
+                    public void setValues(PreparedStatement ps, int i)
+                            throws SQLException {
+                        ps.setLong(1, giftCertificate.getId());
+                        ps.setLong(2, tags.get(i).getId());
+                    }
+
+                    public int getBatchSize() {
+                        return tags.size();
+                    }
+                });
     }
 
 }

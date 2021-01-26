@@ -7,8 +7,8 @@ CREATE TABLE gift_db.gift_certificates (
   description VARCHAR(300) NOT NULL unique,
   price INT NOT NULL,
   duration INT NOT NULL,
-  create_date TIMESTAMP(2) not null ,
-  last_update_date timestamp(2) not null
+  create_date TIMESTAMP not null ,
+  last_update_date timestamp not null
   );
 
 

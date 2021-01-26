@@ -2,11 +2,11 @@ package com.epam.esm.configuration;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
@@ -51,7 +51,8 @@ public class DBConfig {
      * @return DataSource
      */
     @Bean
-    public DataSource dataSource() {
+    @Profile("prod")
+    public DataSource dataSourceProd() {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
         try {
             dataSource.setDriverClass(DRIVER_CLASS);
@@ -70,7 +71,27 @@ public class DBConfig {
      * @return
      */
     @Bean
-    public JdbcTemplate jdbcTemplate() {
-        return new JdbcTemplate(dataSource());
+    @Profile("prod")
+    public JdbcTemplate jdbcTemplateProd() {
+        return new JdbcTemplate(dataSourceProd());
+    }
+
+    @Bean
+    @Profile("dev")
+    public DataSource testDataSource() {
+        return new EmbeddedDatabaseBuilder()
+                .generateUniqueName(true)
+                .setType(EmbeddedDatabaseType.H2)
+                .setScriptEncoding("UTF-8")
+                .ignoreFailedDrops(true)
+                .addScript("test-schema.sql")
+                .addScript("test-data.sql")
+                .build();
+    }
+
+    @Bean
+    @Profile("dev")
+    public JdbcTemplate testJdbcTemplate() {
+        return new JdbcTemplate(testDataSource());
     }
 }

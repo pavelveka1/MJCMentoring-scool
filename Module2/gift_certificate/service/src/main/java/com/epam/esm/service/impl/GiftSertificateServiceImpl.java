@@ -15,10 +15,8 @@ import com.epam.esm.exception.*;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.dto.TagDto;
-import com.epam.esm.service.exception.DuplicateEntryServiceException;
-import com.epam.esm.service.exception.IdNotExistServiceException;
-import com.epam.esm.service.exception.RequestParamServiceException;
-import com.epam.esm.service.exception.TagNameNotExistServiceException;
+import com.epam.esm.service.exception.*;
+import lombok.Data;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Contains methods for work with GiftCertificateDto
  */
 @Service
+@Data
 public class GiftSertificateServiceImpl implements GiftCertificateService {
 
     /**
@@ -58,9 +57,10 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
 
     /**
      * Constcuctor with all parameters
+     *
      * @param giftSertificateJDBCTemplate for operations with GiftCertivicate
-     * @param tagJDBCTemplate for operations with Tag
-     * @param modelMapper for convertion object
+     * @param tagJDBCTemplate             for operations with Tag
+     * @param modelMapper                 for convertion object
      */
     public GiftSertificateServiceImpl(GiftCertificateJDBCTemplate giftSertificateJDBCTemplate, TagJDBCTemplate tagJDBCTemplate, ModelMapper modelMapper) {
         this.giftCertificateJDBCTemplate = giftSertificateJDBCTemplate;
@@ -102,15 +102,13 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
     @Override
     @Transactional
     public GiftCertificateDto read(long id) throws IdNotExistServiceException {
-        Optional<GiftCertificate> foundCertificate;
+        GiftCertificate foundCertificate;
         try {
             foundCertificate = giftCertificateJDBCTemplate.read(id);
         } catch (IdNotExistDAOException e) {
             throw new IdNotExistServiceException(e.getMessage());
         }
-        return foundCertificate
-                .map(giftCertificate -> modelMapper.map(giftCertificate, GiftCertificateDto.class))
-                .orElseThrow(() -> new IdNotExistServiceException("There is no gift certificate with ID = " + id + " in Database"));
+        return modelMapper.map(foundCertificate, GiftCertificateDto.class);
     }
 
     /**
@@ -121,12 +119,17 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
      */
     @Override
     @Transactional
-    public GiftCertificateDto update(GiftCertificateDto modifiedGiftCertificateDto) throws IdNotExistServiceException {
+    public GiftCertificateDto update(GiftCertificateDto modifiedGiftCertificateDto) throws IdNotExistServiceException, UpdateServiceException {
+        GiftCertificate updateGiftCertificate;
         GiftCertificate modifiedGiftCertificate = modelMapper.map(modifiedGiftCertificateDto, GiftCertificate.class);
         GiftCertificateDto readGiftCertificateDto = read(modifiedGiftCertificateDto.getId());
         GiftCertificate readGiftCertificate = modelMapper.map(readGiftCertificateDto, GiftCertificate.class);
         updateGiftCertificateFields(readGiftCertificate, modifiedGiftCertificate);
-        GiftCertificate updateGiftCertificate = giftCertificateJDBCTemplate.update(readGiftCertificate);
+        try {
+            updateGiftCertificate = giftCertificateJDBCTemplate.update(readGiftCertificate);
+        } catch (UpdateDAOException e) {
+            throw new UpdateServiceException(e.getMessage());
+        }
         return modelMapper.map(updateGiftCertificate, GiftCertificateDto.class);
     }
 
@@ -140,7 +143,6 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
     @Transactional
     public void delete(long id) throws IdNotExistServiceException {
         try {
-            giftCertificateJDBCTemplate.read(id).orElseThrow(() -> new IdNotExistServiceException("There is no gift certificate with ID = " + id + " in Database"));
             giftCertificateJDBCTemplate.deleteGiftCertificateHasTag(id);
             giftCertificateJDBCTemplate.delete(id);
         } catch (IdNotExistDAOException e) {
@@ -194,13 +196,12 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
             }
             giftCertificateDto.setTags(tags);
         }
-
     }
 
     /**
      * Method updates fieflds GiftCertificate
      *
-     * @param readGiftCertificateDto original GiftCertificate
+     * @param readGiftCertificateDto  original GiftCertificate
      * @param modifiedGiftCertificate updated GiftCertificate
      */
     private void updateGiftCertificateFields(GiftCertificate readGiftCertificateDto, GiftCertificate

@@ -27,10 +27,10 @@ public interface TagDAO {
      * Read one Tag from DB by id
      *
      * @param id Tag with this id will be read from DB
-     * @return Optional<Tag>
+     * @return Tag
      * @throws IdNotExistDAOException if records with such id not exist in DB
      */
-	Optional<Tag> read(long id) throws IdNotExistDAOException;
+	Tag read(long id) throws IdNotExistDAOException;
 
     /**
      * Delete Tag from DB by id

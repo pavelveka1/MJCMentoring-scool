@@ -2,7 +2,7 @@ package com.epam.esm.exception;
 
 /**
  * TagNameNotExistDAOException class.
- * This exception will be thrown when was passed incorrect parameters in request
+ * This exception will be thrown when wore passed incorrect parameters in request
  */
 public class TagNameNotExistDAOException extends Exception {
 

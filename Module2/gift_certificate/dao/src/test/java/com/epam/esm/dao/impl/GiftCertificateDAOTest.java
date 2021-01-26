@@ -1,36 +1,32 @@
 package com.epam.esm.dao.impl;
 
+import com.epam.esm.configuration.DBConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.GiftCertificateMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.TagMapper;
-import com.epam.esm.configuration.TestConfig;
 import com.epam.esm.exception.DuplicateEntryDAOException;
 import com.epam.esm.exception.IdNotExistDAOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.epam.esm.exception.RequestParamDAOException;
+import com.epam.esm.exception.UpdateDAOException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
-import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
 import java.util.Optional;
 
-@SpringJUnitConfig(classes = TestConfig.class)
-@SqlMergeMode(value = SqlMergeMode.MergeMode.MERGE)
+@SpringJUnitConfig(classes = DBConfig.class)
+@ActiveProfiles("dev")
 @WebAppConfiguration
-@ActiveProfiles("test")
 public class GiftCertificateDAOTest {
 
     private static final String SELECT_ALL_CERTIFICATES = "SELECT * FROM gift_db.gift_certificates;";
@@ -41,9 +37,6 @@ public class GiftCertificateDAOTest {
             "join gift_db.tags\n" +
             "on gift_db.gift_certificates_has_tags.tags_id = gift_db.tags.id\n" +
             "where gift_db.gift_certificates_has_tags.gift_certificates_id=?;";
-
-    @Autowired
-    private static EmbeddedDatabase embeddedDatabase;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -74,7 +67,6 @@ public class GiftCertificateDAOTest {
         GiftCertificate createdGiftCertificate = giftSertificateJDBCTemplate.create(giftCertificate);
         long idCreatedGiftCertificate = createdGiftCertificate.getId();
         GiftCertificate expectedGiftCertificate = jdbcTemplate.queryForObject(GET_GIFT_CERTIFICATE_BY_ID, new Object[]{idCreatedGiftCertificate}, giftCertificateMapper);
-
         assertEquals(expectedGiftCertificate, createdGiftCertificate);
     }
 
@@ -93,7 +85,7 @@ public class GiftCertificateDAOTest {
 
     @DisplayName("method should throw DuplicateEntryDAOException")
     @Test
-    public void createGiftCertificatesDuplicate() throws DuplicateEntryDAOException {
+    public void createGiftCertificatesDuplicateEntryDAOException() throws DuplicateEntryDAOException {
         GiftCertificate giftCertificate = new GiftCertificate();
         giftCertificate.setName("Поeлет на дельтоплане");
         giftCertificate.setDescription("it doesn't matter");
@@ -108,7 +100,7 @@ public class GiftCertificateDAOTest {
 
     @DisplayName("method should update name of gift certificate")
     @Test
-    public void updateGiftCertificateName() {
+    public void updateGiftCertificateName() throws UpdateDAOException {
         GiftCertificate giftCertificate = jdbcTemplate.queryForObject(GET_GIFT_CERTIFICATE_BY_ID, new Object[]{3}, giftCertificateMapper);
         giftCertificate.setName("name for update");
         giftSertificateJDBCTemplate.update(giftCertificate);
@@ -118,7 +110,7 @@ public class GiftCertificateDAOTest {
 
     @DisplayName("return value shouldn't be null")
     @Test
-    public void updateGiftCertificateReturnNotNull() {
+    public void updateGiftCertificateReturnNotNull() throws UpdateDAOException {
         GiftCertificate giftCertificate = jdbcTemplate.queryForObject(GET_GIFT_CERTIFICATE_BY_ID, new Object[]{2}, giftCertificateMapper);
         giftCertificate.setName("new name for update");
         assertNotNull(giftSertificateJDBCTemplate.update(giftCertificate));
@@ -127,19 +119,19 @@ public class GiftCertificateDAOTest {
     @DisplayName("return value shouldn't be null")
     @Test
     public void readGiftCertificateById() throws IdNotExistDAOException {
-        Optional<GiftCertificate> optionalGiftCertificate = giftSertificateJDBCTemplate.read(1);
+        GiftCertificate giftCertificate = giftSertificateJDBCTemplate.read(1);
         GiftCertificate expected = jdbcTemplate.queryForObject(GET_GIFT_CERTIFICATE_BY_ID, new Object[]{1}, giftCertificateMapper);
         List<Tag> tags = jdbcTemplate.query(SELECT_TAGS_BY_CERTIFICATE_ID, new Object[]{expected.getId()}, tagMapper);
         expected.setTags(tags);
-        assertEquals(optionalGiftCertificate.get(), expected);
+        assertEquals(giftCertificate, expected);
     }
 
     @DisplayName("return value shouldn't be null")
     @Test
     public void readGiftCertificateByIdNotNull() throws IdNotExistDAOException {
-        Optional<GiftCertificate> optionalGiftCertificate = giftSertificateJDBCTemplate.read(1);
+        GiftCertificate giftCertificate = giftSertificateJDBCTemplate.read(1);
 
-        assertNotNull(optionalGiftCertificate.get());
+        assertNotNull(giftCertificate);
     }
 
     @DisplayName("throw IdNotExistDAOException")
@@ -153,10 +145,9 @@ public class GiftCertificateDAOTest {
 
     @DisplayName("should return all gift certificates")
     @Test
-    public void findAllGiftCertificatesCount() throws RequestParamDAOException {
+    public void findAllGiftCertificatesNotNull() throws RequestParamDAOException {
         List<GiftCertificate> result = giftSertificateJDBCTemplate.findAll(null, null);
         assertNotNull(result);
-        assertEquals(10, result.size());
     }
 
     @DisplayName("should return all gift certificates")
@@ -166,7 +157,7 @@ public class GiftCertificateDAOTest {
         List<GiftCertificate> expect = jdbcTemplate.query(SELECT_ALL_CERTIFICATES_SORT_BY_NAME, giftCertificateMapper);
         GiftCertificate actualGiftCertificate;
         GiftCertificate expectedGiftCertificate;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < actual.size(); i++) {
             actualGiftCertificate = actual.get(i);
             expectedGiftCertificate = expect.get(i);
             assertEquals(actualGiftCertificate.getId(), expectedGiftCertificate.getId());
@@ -175,7 +166,7 @@ public class GiftCertificateDAOTest {
 
     @DisplayName("should be thrown RequestParamDAOException")
     @Test
-    public void findAllGiftCertificates() {
+    public void findAllGiftCertificatesBadRequestParams() {
         assertThrows(RequestParamDAOException.class, () -> {
             giftSertificateJDBCTemplate.findAll("not_exist_field", "DESC");
         });

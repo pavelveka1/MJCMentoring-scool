@@ -49,7 +49,7 @@ public class TagController {
      * @param tagDto - it is new Tag
      * @return created tag as tegDto
      * @throws DuplicateEntryServiceException is such tag alredy exist in DB
-     * @method createTag - create new tag in DB
+     *                                        method createTag - create new tag in DB
      */
     @PostMapping("/tags")
     @ResponseStatus(HttpStatus.CREATED)
@@ -64,7 +64,7 @@ public class TagController {
      * @param id
      * @return Tag with passed is as TagDto
      * @throws IdNotExistServiceException if Tag with such id doesn't exist in DB
-     * @method readTagById - read tag by id
+     *                                    method readTagById - read tag by id
      */
     @GetMapping("/tags/{id}")
     public TagDto readTagById(@PathVariable long id) throws IdNotExistServiceException {

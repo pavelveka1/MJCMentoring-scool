@@ -1,39 +1,32 @@
 package com.epam.esm.dao.impl;
 
-import com.epam.esm.configuration.TestConfig;
+import com.epam.esm.configuration.DBConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.GiftCertificateMapper;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.TagMapper;
 import com.epam.esm.exception.DuplicateEntryDAOException;
 import com.epam.esm.exception.IdNotExistDAOException;
+import com.epam.esm.exception.TagNameNotExistDAOException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
-import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringJUnitConfig(classes = TestConfig.class)
-@SqlMergeMode(value = SqlMergeMode.MergeMode.MERGE)
+@SpringJUnitConfig(classes = DBConfig.class)
+@ActiveProfiles("dev")
 @WebAppConfiguration
-@ActiveProfiles("test")
 public class TagDAOTest {
 
     private static final String GET_TAG_BY_ID = "SELECT * FROM gift_db.tags where gift_db.tags.id=?";
-    private static final String GET_ALL_TAGS = "SELECT * FROM gift_db.tags";
-    private static final String CREATE_TAG = "INSERT INTO `gift_db`.`tags` (`name`) VALUES (?);";
-    private static final String DELETE_TAG = "DELETE FROM `gift_db`.`tags` WHERE (`id` = ?);";
     private static final String GET_CERTIFICATES_BY_TAG_ID = "SELECT \n" +
             "gift_db.gift_certificates.id,\n" +
             "gift_db.gift_certificates.name,\n" +
@@ -93,7 +86,7 @@ public class TagDAOTest {
 
     @DisplayName("should be thrown IdNotExistDAOException ")
     @Test
-    public void deleteTagById() {
+    public void deleteTagById() throws IdNotExistDAOException {
         tagJDBCTemplate.delete(15);
         assertThrows(IdNotExistDAOException.class, () -> {
             tagJDBCTemplate.read(15);
@@ -103,7 +96,7 @@ public class TagDAOTest {
     @DisplayName("read tag by id ")
     @Test
     public void readTagById() throws IdNotExistDAOException {
-        Tag tag = tagJDBCTemplate.read(5).get();
+        Tag tag = tagJDBCTemplate.read(5);
         Tag actualTag = jdbcTemplate.queryForObject(GET_TAG_BY_ID, new Object[]{5}, tagMapper);
         List<GiftCertificate> giftCertificates = jdbcTemplate.query(GET_CERTIFICATES_BY_TAG_ID, new Object[]{5}, giftCertificateMapper);
         actualTag.setCertificates(giftCertificates);
@@ -114,22 +107,37 @@ public class TagDAOTest {
     @Test
     public void readTagByNotExistId() throws IdNotExistDAOException {
         assertThrows(IdNotExistDAOException.class, () -> {
-            tagJDBCTemplate.read(100).get();
+            tagJDBCTemplate.read(100);
         });
     }
 
     @DisplayName("get all tags")
     @Test
-    public void readAllTags() {
-        List<Tag> tags = tagJDBCTemplate.findAll();
-        assertNotNull( tags);
-    }
-
-    @DisplayName("list of tags is not null")
-    @Test
     public void readAllTagsNotNull() {
         List<Tag> tags = tagJDBCTemplate.findAll();
         assertNotNull(tags);
+    }
+
+    @DisplayName("tag is not null")
+    @Test
+    public void readTagByNameNotNull() throws TagNameNotExistDAOException {
+        Tag tag = tagJDBCTemplate.readTagByName("Развлечения");
+        assertNotNull(tag);
+    }
+
+    @DisplayName("should be thrown TagNameNotExistDAOException")
+    @Test
+    public void readTagByNotExistName() throws TagNameNotExistDAOException {
+        assertThrows(TagNameNotExistDAOException.class, () -> {
+            tagJDBCTemplate.readTagByName("NotExistName");
+        });
+    }
+
+    @DisplayName("should be returned tag with name 'Развлечения'")
+    @Test
+    public void readTagByName() throws TagNameNotExistDAOException {
+        Tag tag = tagJDBCTemplate.readTagByName("Развлечения");
+        assertEquals("Развлечения", tag.getName());
     }
 
 }

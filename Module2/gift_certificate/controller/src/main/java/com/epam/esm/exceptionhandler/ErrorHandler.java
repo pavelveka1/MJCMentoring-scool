@@ -18,8 +18,8 @@ public class ErrorHandler {
     /**
      * Constructor with two parameters
      *
-     * @param errorMessage
-     * @param errorCode
+     * @param errorMessage message about exception
+     * @param errorCode code of exception
      */
     public ErrorHandler(String errorMessage, int errorCode) {
         this.errorMessage = errorMessage;
