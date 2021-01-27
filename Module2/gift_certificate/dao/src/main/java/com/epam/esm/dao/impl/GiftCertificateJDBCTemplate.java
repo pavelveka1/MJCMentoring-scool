@@ -199,23 +199,6 @@ public class GiftCertificateJDBCTemplate implements GiftCertificateDAO {
     }
 
     /**
-     * Delete records from link table
-     *
-     * @param id Entries in link table will be deleted for GiftCertificate with this id
-     * @throws IdNotExistDAOException if record with such id not exist in DB
-     */
-    @Override
-    public void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException {
-
-        int i = jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_HAS_TAG, id);
-        if (i == 0) {
-            logger.info("id = " + id + " of GiftCertificate is not found in gift_certificates_has_tags table of DB");
-            throw new IdNotExistDAOException("There is no entry with ID = " + id + " in table gift_certificates_has_tags Database");
-        }
-        logger.info(" Entries with id = " + id + " of GiftCertificate have been deleted in gift_certificates_has_tags table of DB");
-    }
-
-    /**
      * Create records in link table
      *
      * @param giftCertificate create Entries in link table for this GiftCertificate

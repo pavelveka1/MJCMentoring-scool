@@ -143,7 +143,6 @@ public class GiftSertificateServiceImpl implements GiftCertificateService {
     @Transactional
     public void delete(long id) throws IdNotExistServiceException {
         try {
-            giftCertificateJDBCTemplate.deleteGiftCertificateHasTag(id);
             giftCertificateJDBCTemplate.delete(id);
         } catch (IdNotExistDAOException e) {
             throw new IdNotExistServiceException(e.getMessage());

@@ -30,7 +30,6 @@ import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @RunWith(JUnitPlatform.class)
@@ -222,11 +221,9 @@ public class GiftCertificateServiceImplTest {
     @DisplayName("should be thrown IdNotExistServiceException")
     @Test
     public void deleteGiftCertificateByNotExistId() throws IdNotExistDAOException, IdNotExistServiceException {
-        doNothing().when(giftCertificateJDBCTemplate).deleteGiftCertificateHasTag(7);
         doNothing().when(giftCertificateJDBCTemplate).delete(7);
         giftCertificateService.delete(7);
         verify(giftCertificateJDBCTemplate, times(1)).delete(7);
-        verify(giftCertificateJDBCTemplate, times(1)).deleteGiftCertificateHasTag(7);
 
     }
 }

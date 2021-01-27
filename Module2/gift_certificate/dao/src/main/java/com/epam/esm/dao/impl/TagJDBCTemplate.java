@@ -32,7 +32,7 @@ public class TagJDBCTemplate implements TagDAO {
     private static final String GET_TAG_BY_ID = "SELECT * FROM gift_db.tags where gift_db.tags.id=?";
     private static final String GET_ALL_TAGS = "SELECT * FROM gift_db.tags";
     private static final String CREATE_TAG = "INSERT INTO gift_db.tags (name) VALUES (?);";
-    private static final String DELETE_TAG = "DELETE FROM gift_db.tags WHERE (id = ?);";
+    private static final String DELETE_TAG = "DELETE FROM gift_db.tags WHERE gift_db.tags.id=?;";
     private static final String GET_CERTIFICATES_BY_TAG_ID = "SELECT \n" +
             "gift_db.gift_certificates.id,\n" +
             "gift_db.gift_certificates.name,\n" +
@@ -120,7 +120,6 @@ public class TagJDBCTemplate implements TagDAO {
         if (i == 0) {
             throw new IdNotExistDAOException("Tag with id = " + id + " not exist");
         }
-        deleteGiftCertificateHasTag(id);
     }
 
     /**
@@ -155,19 +154,6 @@ public class TagJDBCTemplate implements TagDAO {
             throw new TagNameNotExistDAOException("Tag with name = " + tagName + " is not exist");
         }
         return tag.get();
-    }
-
-    /**
-     * Delete records from link table
-     *
-     * @param id it is id of tag whose link with GiftCertificates will be deleted
-     * @throws IdNotExistDAOException if such id doesn't exist in link table of DB
-     */
-    private void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException {
-        int i = jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_HAS_TAG_BY_TAG_ID, id);
-        if (i == 0) {
-            throw new IdNotExistDAOException("There are not id = " + id + "tag in gift_certificates_has_tags table of DB");
-        }
     }
 
     /**

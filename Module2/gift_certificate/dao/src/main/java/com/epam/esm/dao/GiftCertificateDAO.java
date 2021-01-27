@@ -60,12 +60,4 @@ public interface GiftCertificateDAO {
      */
     List<GiftCertificate> findAll(String sortType, String orderType) throws RequestParamDAOException;
 
-    /**
-     * Delete records from link table
-     *
-     * @param id it is id of tag whose link with GiftCertificates will be deleted
-     * @throws IdNotExistDAOException if such id doesn't exist in link table of DB
-     */
-    void deleteGiftCertificateHasTag(long id) throws IdNotExistDAOException;
-
 }
