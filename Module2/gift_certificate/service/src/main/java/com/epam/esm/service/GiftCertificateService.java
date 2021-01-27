@@ -2,23 +2,59 @@ package com.epam.esm.service;
 
 import java.util.List;
 
-import com.epam.esm.dao.ModeOfSort;
-import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.exception.UpdateDAOException;
+import com.epam.esm.service.dto.GiftCertificateDto;
+import com.epam.esm.service.exception.*;
 
+/**
+ * Interface GiftCertificateService.
+ * Contains methods for work with GiftCertificateDto
+ */
 public interface GiftCertificateService {
-	
-	GiftCertificate create(GiftCertificate giftCertificate);
 
-	GiftCertificate read(long id);
+    /**
+     * Create GiftCertificate in DB
+     *
+     * @param giftCertificateDto it contains data for creation giftCertificate
+     * @return created GiftCertificate as GiftCertificateDto
+     * @throws DuplicateEntryServiceException if this GiftCertificate already exists in the DB
+     */
+    GiftCertificateDto create(GiftCertificateDto giftCertificateDto) throws DuplicateEntryServiceException, TagNameNotExistServiceException;
 
-	GiftCertificate update( GiftCertificate giftCertificate);
+    /**
+     * Read GiftCertificateDto from DB by id
+     *
+     * @param id id of GiftCertificate
+     * @return GiftCertificateDto
+     * @throws IdNotExistServiceException if records with such id not exist in DB
+     */
+    GiftCertificateDto read(long id) throws IdNotExistServiceException;
 
-	boolean delete(long id);
 
-	List<GiftCertificate> findByTagName(String tagName, ModeOfSort modeOfSort);
+    /**
+     * Update GiftCertificate as GiftCertificateDto
+     *
+     * @param giftCertificateDto modified GiftCertificate
+     * @return updated GiftCertificateDto
+     */
+    GiftCertificateDto update(GiftCertificateDto giftCertificateDto) throws UpdateServiceException, IdNotExistServiceException;
 
-	List<GiftCertificate> findByPartOfName(String name, ModeOfSort modeOfSort);
+    /**
+     * Delete GiftCertificate from DB by id
+     *
+     * @param id id of GiftCertificate
+     * @throws IdNotExistServiceException if record with such id not exist in DB
+     */
+    void delete(long id) throws IdNotExistServiceException;
 
-	List<GiftCertificate> findAll(ModeOfSort modeOfSort);
+    /**
+     * Find all giftCertificates with condition determined by parameters
+     *
+     * @param sortType  name of field of table in DB
+     * @param orderType ASC or DESC
+     * @return list og GiftCertificates
+     * @throws RequestParamServiceException if parameters don't right
+     */
+    List<GiftCertificateDto> findAll(String sortType, String orderType) throws RequestParamServiceException;
 
 }
